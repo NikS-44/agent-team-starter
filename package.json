@@ -1,0 +1,16 @@
+{
+  "name": "agent-team-starter",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "dev:ready": "bash scripts/dev-ready.sh",
+    "dev:stop": "bash scripts/dev-stop.sh"
+  }
+}

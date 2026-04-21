@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/agents/architect.md ~/.claude/agents/architect.md)",
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/agents/critic.md ~/.claude/agents/critic.md)",
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/agents/builder.md ~/.claude/agents/builder.md)",
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/agents/reviewer.md ~/.claude/agents/reviewer.md)",
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/commands/ship.md ~/.claude/commands/ship.md)"
+    ]
+  }
+}
