@@ -2,13 +2,20 @@
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "entry": ["src/test/setup.ts", "server/index.ts", "scripts/seed.ts"],
   "ignorePatterns": ["dist/**", "public/mockServiceWorker.js", ".claude/**"],
+  "ignoreDependencies": [
+    "date-fns",
+    "next-themes",
+    "shadcn",
+    "@fontsource-variable/geist",
+    "tw-animate-css"
+  ],
   "rules": {
     "unused-files": "error",
     "unused-exports": "warn",
     "unused-types": "warn",
     "circular-dependencies": "error",
-    "unused-dependencies": "off",
-    "unresolved-imports": "off"
+    "unused-dependencies": "warn",
+    "unresolved-imports": "warn"
   },
   "health": {
     "maxCyclomatic": 15,
