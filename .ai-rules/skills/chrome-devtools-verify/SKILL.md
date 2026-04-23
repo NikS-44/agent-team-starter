@@ -36,9 +36,35 @@ Repeat for **happy path**, **empty/error** states, and **mobile width** if relev
 
 ## Saving screenshots (artifacts)
 
-- Prefer **`take_screenshot`** with **`filePath`** so images land in the workspace (reviewable in PRs). Example relative path: `verification/<feature-branch-or-ticket>/01-list-view.png`.
+- Prefer **`take_screenshot`** with **`filePath`** so images land in the workspace (easy to find while you work). Example relative path: `verification/<feature-branch-or-ticket>/01-list-view.png`.
 - Use **`format`**: `png` (default), `jpeg`, or `webp`; set **`quality`** for lossy formats.
 - **Full-page** shots are best for “what shipped” summaries; use **element `uid`** for a specific card, form, or chart.
+
+### PR thread only — no commit (gist + `gh`)
+
+GitHub CLI cannot upload into the same inline slot as pasting in the web UI, but you can **host PNGs on a gist** and comment with `![](https://…)` so images render in the PR **without** adding binaries to the repo.
+
+1. Capture files locally (MCP `take_screenshot` + `filePath`, or any temp paths).
+2. Resolve each file’s **raw URL** after creating the gist. `gh gist create` prints the gist page URL; the API exposes stable raw links per file:
+   ```bash
+   gist_id=…   # last path segment of https://gist.github.com/<user>/<gist_id>
+   gh api "gists/${gist_id}" --jq '.files["happy-path.png"].raw_url'
+   ```
+3. Post Markdown on the PR (URLs from step 2 work in `![](…)` — `gh api --jq` prints the string without extra quotes):
+   ```bash
+   url=$(gh api "gists/${gist_id}" --jq '.files["happy-path.png"].raw_url')
+   gh pr comment <N> --body "## Verification
+
+   ![happy path](${url})"
+   ```
+
+**One-shot helper (recommended):** from the repo root, after `gh auth login`:
+
+```bash
+scripts/pr-comment-verify-gist.sh <pr-number> path/to/happy-path.png [path/to/error-path.png ...]
+```
+
+This creates an **unlisted (secret)** gist by default (raw URLs still work in the PR comment). Set `VERIFY_GIST_PUBLIC=1` if you want a **public** gist.
 
 **Video:** The bundled MCP in this project exposes **screenshot** tools. **Screen recording / WebM** usually requires `chrome-devtools-mcp` experimental screencast + **ffmpeg** (see upstream README). If video is required and MCP cannot record, fall back to: (1) a **sequence of screenshots** with numbered filenames, or (2) asking the user to record manually while you provide a **click path**.
 
