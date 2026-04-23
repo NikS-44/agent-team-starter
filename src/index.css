@@ -127,4 +127,7 @@
   html {
     @apply scroll-smooth font-sans;
   }
+  button {
+    @apply cursor-pointer;
+  }
 }
