@@ -1,3 +1,4 @@
+import { useShipVerify } from "@/api/shipVerify";
 import {
   Accordion,
   AccordionContent,
@@ -33,6 +34,7 @@ import {
   CheckCircle2,
   ChevronDown,
   Circle,
+  Database,
   ExternalLink,
   ImageIcon,
   ListChecks,
@@ -63,6 +65,80 @@ const browserGate = [
 
 function reportById(id: string) {
   return SHIP_REPORTS.find((r) => r.id === id) ?? SHIP_REPORTS[0];
+}
+
+function ShipBackendVerifyCard() {
+  const { data, isPending, isError, error } = useShipVerify();
+
+  return (
+    <Card className="border-border/80">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Database className="size-5" aria-hidden />
+          <CardTitle role="heading" aria-level={2}>
+            Backend &amp; database
+          </CardTitle>
+        </div>
+        <CardDescription>
+          Live snapshot from the API and SQLite (same request path as the browser). After backend or
+          schema work, open this page with the dev stack running and confirm{" "}
+          <code className="text-xs">GET /api/ship-verify</code> returns{" "}
+          <code className="text-xs">200</code> and the counts match what you expect. Chrome DevTools
+          MCP can use this route for network + screenshot evidence without extra curl steps.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {isPending ? <p className="text-sm text-muted-foreground">Checking database…</p> : null}
+        {isError ? (
+          <Alert variant="destructive">
+            <AlertTitle>Could not reach /api/ship-verify</AlertTitle>
+            <AlertDescription className="text-xs">
+              {error instanceof Error ? error.message : "Unknown error"}
+            </AlertDescription>
+          </Alert>
+        ) : null}
+        {data ? (
+          <div className="space-y-2 text-sm" data-testid="ship-verify-panel">
+            <p data-testid="ship-verify-status" className="flex items-center gap-2 font-medium">
+              {data.ok ? (
+                <>
+                  <CheckCircle2 className="size-4 text-primary" aria-hidden />
+                  All checks passed
+                </>
+              ) : (
+                <>
+                  <Circle className="size-4 text-destructive" aria-hidden />
+                  Database check failed
+                </>
+              )}
+            </p>
+            <dl className="grid grid-cols-1 gap-2 text-muted-foreground sm:grid-cols-2">
+              <div>
+                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  Users rows
+                </dt>
+                <dd className="font-mono text-foreground">{data.database.usersRowCount}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  Drizzle migrations (journal)
+                </dt>
+                <dd className="font-mono text-foreground">
+                  {data.database.drizzleMigrationsCount ?? "—"}
+                </dd>
+              </div>
+              <div className="sm:col-span-2">
+                <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  Checked at
+                </dt>
+                <dd className="font-mono text-xs text-foreground">{data.checkedAt}</dd>
+              </div>
+            </dl>
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
 }
 
 export function ShipReportPage() {
@@ -126,6 +202,8 @@ export function ShipReportPage() {
           </DropdownMenu>
         </div>
       </div>
+
+      <ShipBackendVerifyCard />
 
       <section
         className="space-y-4 rounded-2xl border border-border/80 bg-card/30 p-4 sm:p-6"

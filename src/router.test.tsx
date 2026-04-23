@@ -56,5 +56,11 @@ describe("router", () => {
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: /ship report/i })).toBeInTheDocument()
     );
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: /backend & database/i })).toBeInTheDocument()
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId("ship-verify-status")).toHaveTextContent(/all checks passed/i)
+    );
   });
 });

@@ -8,13 +8,18 @@ import {
   UsersListSchema,
 } from "./users.schemas";
 
+// fallow-ignore-next-line unused-type
 export type { CreateUserBody, UpdateUserBody, User } from "./users.schemas";
 
+// fallow-ignore-next-line unused-export
 export { CreateUserBodySchema, UpdateUserBodySchema, UserSchema } from "./users.schemas";
 
 export const queryKeys = {
   users: {
     all: () => ["users"] as const,
+  },
+  shipVerify: {
+    all: () => ["ship-verify"] as const,
   },
 } as const;
 
