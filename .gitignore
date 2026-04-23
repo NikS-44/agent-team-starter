@@ -15,6 +15,10 @@ test-results/
 .fallow/
 .cursor/mcp-memory.jsonl
 
+# Verification screenshots and artifacts (local only; keep folder with .gitkeep)
+verification/*
+!verification/.gitkeep
+
 # SQLite (local dev DB + WAL mode sidecars — regenerate via migrate/seed, do not commit)
 *.sqlite
 *.sqlite-shm
