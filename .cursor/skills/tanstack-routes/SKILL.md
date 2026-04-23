@@ -28,7 +28,7 @@ description: >-
 4. **Root redirect** — `/` is handled by `indexRoute` with `redirect` to `/users`. If the product default should change, edit that `beforeLoad` only; do not duplicate redirects.
 5. **Navigation** — append to `mainNav` in `AppShell.tsx` with `to`, `label`, and a `lucide-react` icon. Active state uses `pathname === item.to` or `pathname.startsWith(\`${item.to}/\`)` for nested routes.
 6. **Types** — `Register` in `router.ts` picks up the router type; new routes need no extra declaration if they use the shared `createAppRouter` pattern.
-7. **Tests** — add a `renderWithRouter({ initialPath: "/your-segment" })` case; assert the page heading (or a stable landmark).
+7. **Tests** — add a `renderWithRouter({ initialPath: "/your-segment" })` case; assert the page heading (or a stable landmark). The **`/ship-report`** route is reserved for the ship workflow checklist; do not repurpose it for product features.
 
 ## Conventions
 
