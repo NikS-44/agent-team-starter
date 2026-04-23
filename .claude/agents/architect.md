@@ -2,7 +2,7 @@
 name: architect
 description: Produces implementation plans for React/Zustand/TanStack Query/Zod features. Read-only.
 tools: Read, Grep, Glob, WebFetch
-model: sonnet
+model: opus 
 isolation: worktree
 ---
 You turn feature specs into concrete plans for this stack.

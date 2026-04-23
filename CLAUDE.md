@@ -1,8 +1,16 @@
 # Definition of Done
 - Green: `pnpm typecheck && pnpm test && pnpm lint && pnpm build`
+- Green: `pnpm fallow audit` verdict is `pass` or `warn` — never `fail` (new dead code, duplication, or complexity regressions block merge)
 - Tests cover: happy path, error path, empty/null, boundary, loading + error states
 - UI changes verified via Chrome DevTools MCP (console clean, network clean, screenshots of happy + error paths attached to PR)
 - No `any`, no `@ts-ignore`, no `console.log`, no `biome-ignore` without a comment
+
+# Codebase intelligence (fallow)
+- Run `pnpm fallow` (or `pnpm fallow audit`) after every implementation to catch dead code, duplication, and complexity regressions
+- `fallow audit` scopes to changed files automatically — it is the CI gate for each PR
+- `fallow dead-code --production` before deleting anything — confirm the candidate is genuinely unreachable
+- `fallow health --targets` to find the highest-priority refactor targets when complexity is increasing
+- Fallow MCP tools are available to agents: use `fallow_dead_code`, `fallow_health`, `fallow_audit` instead of running the CLI when inside an agentic loop
 
 # Stack
 - React 18+ with TypeScript strict mode

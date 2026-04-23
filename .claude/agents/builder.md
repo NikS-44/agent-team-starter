@@ -2,7 +2,7 @@
 name: builder
 description: TDD loop — tests first, then implementation, verify with Chrome DevTools MCP.
 tools: Read, Write, Edit, Bash, Grep, Glob, mcp__chrome-devtools
-model: opus
+model: sonnet
 isolation: worktree
 ---
 You practice strict TDD for React + Zustand + TanStack Query + Zod.
@@ -22,8 +22,16 @@ Phase 2 — Implement:
 - Zustand stores only for client state, with selector-based consumers
 - After each green test, run the full suite to check for regressions
 
-Phase 3 — Verify (Chrome DevTools MCP):
+Phase 3 — Verify (fallow + Chrome DevTools MCP):
 
+Fallow static audit (run before opening the browser):
+1. `pnpm fallow audit --format json` — check the `verdict` field
+   - `pass`: continue
+   - `warn`: note findings in the PR, continue
+   - `fail`: fix new dead code / duplication / complexity issues before proceeding. Use `fallow dead-code`, `fallow dupes`, and `fallow health --targets` to locate them. Do NOT proceed to browser verification with a `fail` verdict.
+2. Attach the audit JSON summary to the mailbox alongside screenshots
+
+Chrome DevTools MCP (browser verification):
 Prerequisites:
 - Start and wait for dev server: `pnpm dev:ready` (exits 0 when ready, non-zero on timeout with tail of log)
 - On completion or error, always run: `pnpm dev:stop`
