@@ -9,25 +9,39 @@ import { fileURLToPath } from "node:url"
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(__dirname, "..")
 
+function warn(message) {
+  process.stderr.write(`${message}\n`)
+}
+
+/**
+ * @param {string} linkAbs
+ * @param {string} targetAbs
+ * @returns {"keep" | "replace" | "abort"}
+ */
+function existingLinkDisposition(linkAbs, targetAbs) {
+  let stat
+  try {
+    stat = fs.lstatSync(linkAbs)
+  } catch {
+    return "abort"
+  }
+  if (stat.isSymbolicLink() && fs.realpathSync(linkAbs) === path.resolve(targetAbs)) {
+    return "keep"
+  }
+  return "replace"
+}
+
 /**
  * @param {string} targetAbs — absolute path to link target
  * @param {string} linkAbs — absolute path of symlink to create
  * @param {"file" | "dir"} type
  */
+// fallow-ignore-next-line complexity
 function ensureSymlink(targetAbs, linkAbs, type) {
   const isDir = type === "dir"
   if (fs.existsSync(linkAbs)) {
-    let stat
-    try {
-      stat = fs.lstatSync(linkAbs)
-    } catch {
-      return
-    }
-    if (stat.isSymbolicLink()) {
-      if (fs.realpathSync(linkAbs) === path.resolve(targetAbs)) {
-        return
-      }
-    }
+    const disposition = existingLinkDisposition(linkAbs, targetAbs)
+    if (disposition === "abort" || disposition === "keep") return
     fs.rmSync(linkAbs, { recursive: true, force: true })
   } else {
     fs.mkdirSync(path.dirname(linkAbs), { recursive: true })
@@ -49,12 +63,13 @@ const links = [
 
 for (const [target, link, t] of links) {
   if (!fs.existsSync(target)) {
-    console.warn(`[ai-rules] skip missing target: ${path.relative(root, target)}`)
+    warn(`[ai-rules] skip missing target: ${path.relative(root, target)}`)
     continue
   }
   try {
     ensureSymlink(target, link, /** @type {"file"|"dir"} */ (t))
   } catch (e) {
-    console.warn(`[ai-rules] could not link ${path.relative(root, link)}:`, e)
+    const detail = e instanceof Error ? e.message : String(e)
+    warn(`[ai-rules] could not link ${path.relative(root, link)}: ${detail}`)
   }
 }

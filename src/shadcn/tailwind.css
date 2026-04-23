@@ -1,0 +1,2 @@
+/* Thin shim so CSS analyzers resolve a real path; Vite still bundles the preset. */
+@import "../../node_modules/shadcn/dist/tailwind.css";

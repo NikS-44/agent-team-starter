@@ -142,5 +142,6 @@ export {
   InputGroupButton,
   InputGroupText,
   InputGroupInput,
+  // fallow-ignore-next-line unused-export
   InputGroupTextarea,
 };
