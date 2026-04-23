@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "entry": ["src/test/setup.ts"],
+  "ignorePatterns": ["dist/**", "public/mockServiceWorker.js", ".claude/**"],
+  "rules": {
+    "unused-files": "error",
+    "unused-exports": "warn",
+    "unused-types": "warn",
+    "circular-dependencies": "error",
+    "unused-dependencies": "warn"
+  },
+  "health": {
+    "maxCyclomatic": 15,
+    "maxCognitive": 12
+  }
+}
