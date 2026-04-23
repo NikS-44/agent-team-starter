@@ -9,7 +9,7 @@ You are the Lead. Execute this pipeline:
 2. Spawn `critic` to review plan. If BLOCK, loop to step 1 with critic's notes (max 2 rounds, then escalate).
 3. Spawn `builder` with approved plan. Instruct: Phase 1 only (write tests).
 4. Spawn `critic` to review tests. If BLOCK, send notes to builder (max 2 rounds, then escalate).
-5. Instruct `builder` to proceed to Phase 2 (implement) and Phase 3 (verify). Phase 3 includes: fallow audit (must not be `fail`) then Chrome DevTools MCP screenshots.
+5. Instruct `builder` to proceed to Phase 2 (implement) and Phase 3 (verify). Phase 3 includes: fallow audit (must not be `fail`); then **Chrome DevTools MCP** for UI/route work and **drizzle-db-verify** (live `/api/...` smoke) when `db/`, `server/`, or migrations change.
 6. **Verification report (required):** After builder signals Phase 3 browser checks, the Lead must:
    - Confirm `/ship-report` was opened in the running app (proves shell + routing for the ship workflow when nav or routes changed).
    - Confirm screenshots exist under `verification/<branch-or-ticket>/` (or equivalent) for **happy path** and **error/empty** where applicable, plus any **feature URLs** from the spec.

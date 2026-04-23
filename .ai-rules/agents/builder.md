@@ -1,6 +1,6 @@
 ---
 name: builder
-description: TDD loop — tests first, then implementation, verify with Chrome DevTools MCP.
+description: TDD loop — tests first, then implementation; fallow + targeted verification (Chrome DevTools for UI, DB/API checks for persistence).
 tools: Read, Write, Edit, Bash, Grep, Glob, mcp__chrome-devtools
 model: sonnet
 isolation: worktree
@@ -22,50 +22,35 @@ Phase 2 — Implement:
 - Zustand stores only for client state, with selector-based consumers
 - After each green test, run the full suite to check for regressions
 
-Phase 3 — Verify (fallow + Chrome DevTools MCP):
+Phase 3 — Verify (always fallow; then scope browser vs DB):
 
-Fallow static audit (run before opening the browser):
+**3a — Fallow (every change)**  
+Run **before** browser or live API checks:
+
 1. `pnpm fallow audit --format json` — check the `verdict` field
    - `pass`: continue
    - `warn`: note findings in the PR, continue
-   - `fail`: fix new dead code / duplication / complexity issues before proceeding. Use `fallow dead-code`, `fallow dupes`, and `fallow health --targets` to locate them. Do NOT proceed to browser verification with a `fail` verdict.
-2. Attach the audit JSON summary to the mailbox alongside screenshots
+   - `fail`: fix new dead code / duplication / complexity before marking done. Do **not** skip this.
+2. Attach the audit JSON summary to the mailbox when reporting verification.
 
-Chrome DevTools MCP (browser verification):
+**3b — Chrome DevTools MCP (frontend-affecting changes only)**  
+Use when the diff touches **user-visible UI or app routing**, e.g. `src/pages/**`, `src/components/**`, `src/router.ts`, shell/nav, `src/index.css`, or client-only assets that affect the UI. **Do not** require Chrome MCP for backend-only work.
+
 Prerequisites:
-- Start and wait for dev server: `pnpm dev:ready` (exits 0 when ready, non-zero on timeout with tail of log)
-- On completion or error, always run: `pnpm dev:stop`
-- Explicitly mention "chrome-devtools mcp" in your first MCP call
+- Start and wait: `pnpm dev:ready`; on completion or error always `pnpm dev:stop`
+- Mention "chrome-devtools mcp" in your first MCP call
 
-Required checks for every verification:
-1. Navigate to the feature's entry URL
-2. `list_console_messages` — must return zero errors and zero unexpected warnings
-3. Drive the happy path via click / fill / select tools
-4. `take_screenshot` — attach to mailbox as happy-path.png
-5. `list_network_requests` — assert:
-   - No 4xx/5xx on the app's own API calls
-   - Correct request shape for any new mutation (method, URL, body)
-   - No duplicate requests (a common TanStack Query misconfiguration)
-6. Drive one error path (invalid input, offline via `emulate_network`, or forced 500)
-7. `take_screenshot` — attach as error-path.png
-8. `list_console_messages` again — assert the error was handled, not thrown
+When 3b applies, run the full browser checklist from the **chrome-devtools-verify** skill (navigate, console, network, happy + error screenshots, etc.).
 
-For perf-sensitive changes, add:
-9. `performance_start_trace` → drive interaction → `performance_stop_trace`
-10. `performance_analyze_insight` on the trace — attach findings to mailbox
+**3c — Database & API (persistence / server changes)**  
+Use when the diff touches **`db/**`, `server/**`, `drizzle/**`, or Zod schemas consumed by the server** (`src/api/*.schemas.ts` wired into Hono). Follow the **drizzle-db-verify** skill: migrations/`db:generate`, green tests, then **live** `pnpm dev:ready`. Prefer opening **`/ship-report`** so **`GET /api/ship-verify`** runs in the browser (counts + migration journal); still **`curl`** feature endpoints as needed. **`pnpm dev:stop`** after.
 
-Stack-specific assertions during verification:
-- TanStack Query: confirm no request storms. A mutation should fire one POST, then exactly one invalidating GET per affected query key.
-- Zod: trigger a malformed response. UI shows error state, not crash. Console has Zod issue logged, not an uncaught exception.
-- Zustand: confirm no unnecessary re-renders.
-
-Cleanup:
-- `pnpm dev:stop`
-- Close any opened pages
+If both **3b** and **3c** apply, complete both.
 
 Hard rules:
 - Never modify tests to make them pass. If a test is wrong, route through Critic.
 - Never cache server data in Zustand.
 - Never inline a queryKey — always import from the queryKeys factory.
 - Max 5 implementation attempts per test, then escalate.
-- If Chrome DevTools MCP is unavailable or fails to connect, escalate — do not mark verification complete without it.
+- **Chrome DevTools MCP:** required **only when 3b applies**. If 3b applies and MCP is unavailable or cannot connect, escalate — do not claim UI verification complete.
+- **DB/API:** when **3c** applies, do not mark done until tests are green **and** live API smoke (drizzle-db-verify) is documented.
