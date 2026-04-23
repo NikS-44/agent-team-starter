@@ -44,7 +44,9 @@ Repeat for **happy path**, **empty/error** states, and **mobile width** if relev
 
 GitHub CLI cannot upload into the same inline slot as pasting in the web UI, but you can **host PNGs on a gist** and comment with `![](https://…)` so images render in the PR **without** adding binaries to the repo.
 
-**Limitation:** `gh gist create` **rejects binary PNG/JPEG** (“binary file not supported”). For screenshots, either create the gist **in the browser** (drag files) and paste gist raw URLs into `gh pr comment`, or **commit** PNGs under `verification/` with `git add -f` (paths may be gitignored) and use **`![](https://github.com/<owner>/<repo>/blob/<sha>/path/to.png)`** in the PR comment so images render reliably (prefer **`/blob/<sha>/...`** over `raw.githubusercontent.com` for inline Markdown on GitHub).
+**Limitation:** `gh gist create` **rejects binary PNG/JPEG** (“binary file not supported”). For screenshots, either create the gist **in the browser** (drag files) and paste gist raw URLs into `gh pr comment`, or **commit** PNGs under `verification/` with `git add -f` (paths may be gitignored). For inline images in PR comments, use the **blob** URL for the file at a **commit SHA** and append **`?raw=true`** (GitHub serves the binary for `![](…)`):
+
+`https://github.com/<owner>/<repo>/blob/<sha>/path/to.png?raw=true`
 
 1. Capture files locally (MCP `take_screenshot` + `filePath`, or any temp paths).
 2. Resolve each file’s **raw URL** after creating the gist. `gh gist create` prints the gist page URL; the API exposes stable raw links per file:
