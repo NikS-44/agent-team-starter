@@ -106,7 +106,7 @@ export function DashboardDemoPage() {
                 type="button"
                 size="icon-sm"
                 variant="ghost"
-                className="size-8"
+                className={cn("size-8", "hover:bg-gray-200/90 dark:hover:bg-gray-700")}
                 aria-label="More"
               >
                 <MoreHorizontal className="size-4" />
@@ -213,7 +213,10 @@ export function DashboardDemoPage() {
                               type="button"
                               size="icon-sm"
                               variant="ghost"
-                              className="size-8"
+                              className={cn(
+                                "size-8",
+                                "hover:bg-gray-200/90 dark:hover:bg-gray-700"
+                              )}
                               aria-label="Row actions"
                             >
                               <MoreHorizontal className="size-4" />
