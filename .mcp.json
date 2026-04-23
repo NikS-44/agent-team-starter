@@ -10,21 +10,13 @@
     "chrome-devtools": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "chrome-devtools-mcp@latest",
-        "--no-usage-statistics"
-      ],
+      "args": ["-y", "chrome-devtools-mcp@latest", "--no-usage-statistics"],
       "env": {}
     },
     "filesystem": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "${CLAUDE_PROJECT_DIR:-.}"
-      ],
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${CLAUDE_PROJECT_DIR:-.}"],
       "env": {}
     },
     "sequential-thinking": {

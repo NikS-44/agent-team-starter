@@ -31,6 +31,10 @@
     "prepare": "husky",
     "precommit": "lint-staged && pnpm run fallow:audit"
   },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mts,cts,json,jsonc,css,md}": "biome check --write",
+    "*.{ts,tsx,js,jsx,mts,cts}": "oxlint --config .oxlintrc.json --fix"
+  },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
     "@dnd-kit/core": "^6.3.1",
