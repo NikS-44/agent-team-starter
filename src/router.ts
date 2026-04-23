@@ -6,6 +6,8 @@ import {
   redirect,
 } from "@tanstack/react-router";
 import { App } from "./App";
+import { AboutPage } from "./pages/AboutPage";
+import { PlaygroundPage } from "./pages/PlaygroundPage";
 import { UsersPage } from "./pages/UsersPage";
 
 const rootRoute = createRootRoute({ component: App });
@@ -26,7 +28,19 @@ const usersRoute = createRoute({
   component: UsersPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, usersRoute]);
+const playgroundRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/playground",
+  component: PlaygroundPage,
+});
+
+const aboutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/about",
+  component: AboutPage,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, usersRoute, playgroundRoute, aboutRoute]);
 
 export function createAppRouter(opts?: { initialPath?: string }) {
   return createRouter({

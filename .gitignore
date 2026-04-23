@@ -6,6 +6,7 @@ dist
 .dev-server.log
 .env
 .env.local
+data/
 .claude/worktrees/
 playwright-report/
 test-results/
