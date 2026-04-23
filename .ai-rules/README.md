@@ -5,7 +5,7 @@ Everything here is the **only** copy committed to the repo. **Do not** duplicate
 | Path | Role |
 |------|------|
 | `rules/defaults.mdc` | Always-on Cursor/Claude rule: points at `CLAUDE.md` and this layout. |
-| `skills/<name>/SKILL.md` | Agent skills. |
+| `skills/<name>/SKILL.md` | Agent skills (e.g. **chrome-devtools-verify**, **drizzle-db-verify**). |
 | `commands/*.md` | Slash commands (`/ship`, `/ship-light`, `/verify`, …). |
 | `agents/*.md` | Claude pipeline agents. |
 | `mcp.json` | MCP config for the repo; memory still uses **`.cursor/mcp-memory.jsonl`** (gitignored). |

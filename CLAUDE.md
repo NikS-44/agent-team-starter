@@ -2,7 +2,8 @@
 - Green: `pnpm typecheck && pnpm test && pnpm lint && pnpm build`
 - Green: `pnpm fallow audit` verdict is `pass` or `warn` — never `fail` (new dead code, duplication, or complexity regressions block merge)
 - Tests cover: happy path, error path, empty/null, boundary, loading + error states
-- UI changes verified via Chrome DevTools MCP (console clean, network clean, screenshots of happy + error paths attached to PR)
+- UI / route changes: verify via Chrome DevTools MCP (console clean, network clean, screenshots of happy + error paths attached to PR) — see **chrome-devtools-verify** skill
+- DB / API / schema changes: migrations + green tests + live API smoke (`pnpm dev:ready`, exercise `/api/...`, `pnpm dev:stop`) — see **drizzle-db-verify** skill
 - No `any`, no `@ts-ignore`, no `console.log`, no `biome-ignore` without a comment
 
 # Codebase intelligence (fallow)

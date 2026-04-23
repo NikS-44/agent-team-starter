@@ -12,7 +12,7 @@ You are the Lead. Use this path for small or well-scoped work and when you want 
 - **`/memory`:** At kickoff, use it when the spec might repeat a past correction or preference; confirm which `CLAUDE.md` / rules loaded. After a successful PR, persist durable learnings via auto memory or a minimal `CLAUDE.md` edit (keep both tight).
 - **Fallow:** Prefer **Fallow MCP** tools (`fallow_audit`, `fallow_health`, `fallow_dead_code`) per `CLAUDE.md` instead of relying only on `pnpm fallow` CLI when those tools are available—especially in step 4.
 - **Research:** Optional `architect` already has **WebFetch**. The Lead may use web research / fetch tools when the spec depends on external APIs or documentation.
-- **Builder handoff:** In your single builder message, require Fallow MCP for audit/dead-code/health loops when available, Phase 3 Chrome DevTools checks when the change touches UI or routes, and ask for a short auto-memory or `CLAUDE.md` note if the work surfaced a recurring pitfall—before signalling done.
+- **Builder handoff:** In your single builder message, require Fallow MCP for audit/dead-code/health loops when available; Phase 3 **Chrome DevTools** only for UI/routes; **drizzle-db-verify** (tests + live API against dev stack) when DB/server/schema changes; ask for a short auto-memory or `CLAUDE.md` note if the work surfaced a recurring pitfall—before signalling done.
 
 Pipeline:
 

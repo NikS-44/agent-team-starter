@@ -55,7 +55,7 @@ When the feature is **done**, produce a **short report** in the chat (or PR desc
 
 **In-browser “report” using app chrome:** The product UI is already the “story.” The most honest artifact is **screenshots of the real routes** inside **`AppShell`** (sidebar, header, your page). You do **not** need a separate “report page” unless the team adds one. For a **rich, layout-heavy** digest (galleries, side-by-side), consider a **Cursor Canvas** (see the **canvas** skill): use it when the deliverable is a **standalone visual artifact**; import rules for `.canvas.tsx` are strict (often `cursor/canvas` only), so **do not** assume you can import this app’s `src/` in a canvas — for **on-brand** reports, **screenshots of the live app** remain the default.
 
-**Optional (repo-specific):** This template app includes demo routes such as `/components-demo` and `/dashboard-demo` for **control** and **layout** reference shots when comparing regressions. For **ship** verification, open **`/ship-report`** in the running app to confirm shell navigation and to copy the in-page **PR blurb** template.
+**Optional (repo-specific):** This template app includes demo routes such as `/components-demo` and `/dashboard-demo` for **control** and **layout** reference shots when comparing regressions. For **ship** verification, open **`/ship-report`**: it confirms shell navigation, shows the **PR blurb** template, and loads **`GET /api/ship-verify`** so you can prove **SQLite + migrations + API** in the same session as UI checks (network tab should show **200** for `/api/ship-verify`).
 
 ## Checklist before saying “verified”
 
@@ -74,3 +74,4 @@ When the feature is **done**, produce a **short report** in the chat (or PR desc
 
 - **Headless CI** — Use Vitest/Playwright in CI; this skill targets **agent-driven** or **local** verification.
 - **No browser** — If MCP is unavailable, state that and fall back to unit/integration tests and code review.
+- **Backend / DB only** — If the change is limited to `db/`, `server/`, `drizzle/`, or server API schemas, use **drizzle-db-verify** instead; do not block on browser MCP.
