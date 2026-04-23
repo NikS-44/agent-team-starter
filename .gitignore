@@ -9,6 +9,8 @@ dist
 # Local DB or app data at repo root only (not src/data/)
 /data/
 .claude/worktrees/
+# Claude Code machine-only prefs (paths, permissions); not shared — see .ai-rules/README.md
+.claude/settings.local.json
 playwright-report/
 test-results/
 *.tsbuildinfo
