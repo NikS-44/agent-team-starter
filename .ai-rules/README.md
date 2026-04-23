@@ -1,23 +1,15 @@
-# Shared AI configuration (`.ai-rules/`)
+# `.ai-rules/` (canonical copy in git)
 
-Everything here is the **only** copy committed to the repo. **Do not** duplicate these files under `.cursor/` or `.claude/`.
+| Path | Use |
+|------|-----|
+| `rules/defaults.mdc` | Always-on rule: points to `CLAUDE.md` and this tree. |
+| `skills/**/SKILL.md` | e.g. **chrome-devtools-verify**, **drizzle-db-verify**, **commit** |
+| `commands/*.md` | Slash commands: `/ship`, `/ship-light`, `/verify` |
+| `agents/*.md` | **architect**, **critic**, **builder**, **reviewer** |
+| `mcp.json` | MCP config (symlinked as `.cursor/mcp.json` after install) |
 
-| Path | Role |
-|------|------|
-| `rules/defaults.mdc` | Always-on Cursor/Claude rule: points at `CLAUDE.md` and this layout. |
-| `skills/<name>/SKILL.md` | Agent skills (e.g. **chrome-devtools-verify**, **drizzle-db-verify**). |
-| `commands/*.md` | Slash commands (`/ship`, `/ship-light`, `/verify`, …). |
-| `agents/*.md` | Claude pipeline agents. |
-| `mcp.json` | MCP config for the repo; memory still uses **`.cursor/mcp-memory.jsonl`** (gitignored). |
+**Symlinks:** After `pnpm install`, `.cursor` / `.claude` link here (see `scripts/ensure-ai-rules-symlinks.mjs`). Repair anytime: `pnpm run ai-rules:link`. On Windows: enable **Developer Mode** or run shell elevated if Git symlinks are off; `postinstall` can still create links.
 
-## Tool entrypoints (symlinks)
+**Not in repo:** `.claude/settings.local.json` (machine local).
 
-After **`pnpm install`**, `postinstall` runs `scripts/ensure-ai-rules-symlinks.mjs` to create:
-
-- **`.cursor/skills`**, **`.cursor/commands`**, **`.cursor/rules`** → same-named dirs under **`.ai-rules/`**
-- **`.cursor/mcp.json`** → **`.ai-rules/mcp.json`**
-- **`.claude/skills`**, **`.claude/commands`**, **`.claude/rules`**, **`.claude/agents`** → same under **`.ai-rules/`** (except **agents** exist only in `.ai-rules/`; Claude’s path is a link to that folder).
-
-On **macOS / Linux**, Git can also store these symlinks directly—either way, **`pnpm run ai-rules:link`** repairs or creates them. On **Windows**, turn on **Developer Mode** (or run your shell as admin) and use `git config core.symlinks true`, or rely on `postinstall` after `pnpm i`.
-
-**Not shared:** **`.claude/settings.local.json`** (machine-only; stays next to `.claude`).
+**New machine setup:** See root `README.md` (clone → `pnpm install` → `pnpm typecheck && pnpm test`).

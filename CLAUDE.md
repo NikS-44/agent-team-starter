@@ -1,36 +1,29 @@
-# Definition of Done
-- Green: `pnpm typecheck && pnpm test && pnpm lint && pnpm build`
-- Green: `pnpm fallow audit` verdict is `pass` or `warn` — never `fail` (new dead code, duplication, or complexity regressions block merge)
-- Tests cover: happy path, error path, empty/null, boundary, loading + error states
-- **UI / route changes:** If the diff touches production UI or routing (typically `src/pages/**`, `src/components/**`, `src/router.ts`, `src/App.tsx`, `src/main.tsx`, `src/index.css`, `src/components/layout/**`, root `index.html`, or UI-related `public/**`), **when Chrome DevTools MCP is available and working**, run **chrome-devtools-verify** before calling the work done (console + network, screenshots with `filePath` under `verification/<branch-or-ticket>/`, `/ship-report` when the ship checklist matters). **If MCP is unavailable or broken** after a quick check, say so under **Verification** on the PR and rely on Vitest/build — that is acceptable; do not treat browser checks as a hard merge blocker.
-- DB / API / schema changes: migrations + green tests + live API smoke (`pnpm dev:ready`, exercise `/api/...`, `pnpm dev:stop`) — see **drizzle-db-verify** skill
-- No `any`, no `@ts-ignore`, no `console.log`, no `biome-ignore` without a comment
+# Definition of done
+- `pnpm typecheck && pnpm test && pnpm lint && pnpm build` — green
+- `pnpm fallow audit` — verdict `pass` or `warn` (not `fail`)
+- Tests: happy, error, empty/null, boundaries, loading + error where relevant
+- **UI / routes** (e.g. `src/pages/**`, `src/components/**`, `src/router.ts`, layout, `src/index.css`): when **Chrome DevTools MCP works**, run **chrome-devtools-verify** (console/network, `take_screenshot` + `filePath` under `verification/<branch-or-ticket>/`, `/ship-report` if in scope). If MCP is down, say so in PR **Verification**; Vitest/build still count — not a hard blocker.
+- **DB / API / schema:** migrations, green tests, live smoke per **drizzle-db-verify** (`pnpm dev:ready`, hit `/api/...`, `pnpm dev:stop`)
+- No `any`, no `@ts-ignore`, no `console.log`, no `biome-ignore` without a reason
 
-# Codebase intelligence (fallow)
-- Run `pnpm fallow` (or `pnpm fallow audit`) after every implementation to catch dead code, duplication, and complexity regressions
-- `fallow audit` scopes to changed files automatically — it is the CI gate for each PR
-- `fallow dead-code --production` before deleting anything — confirm the candidate is genuinely unreachable
-- `fallow health --targets` to find the highest-priority refactor targets when complexity is increasing
-- Fallow MCP tools are available to agents: use `fallow_dead_code`, `fallow_health`, `fallow_audit` instead of running the CLI when inside an agentic loop
+# Fallow
+- After substantive edits: `pnpm fallow` or `pnpm fallow audit` (CI gate; scopes to changed files)
+- Before deleting code: `fallow dead-code --production` to confirm reachability
+- In agents, prefer Fallow **MCP** tools (`fallow_audit`, etc.) over ad-hoc CLI in loops
 
 # Stack
-- React 18+ with TypeScript strict mode
-- State: Zustand for client state, TanStack Query for server state — never mix
-- Validation: Zod schemas as the single source of truth for types at API boundaries
-- Testing: Vitest + React Testing Library (units/integration), Playwright (E2E)
-- Linting/Formatting: Biome (replaces ESLint + Prettier)
+- React 18+, TypeScript strict
+- **Zustand** — client UI/session only. **TanStack Query** — server data (never both for the same data)
+- **Zod** at API boundaries; types via `z.infer`
+- **Vitest** + RTL; Playwright for E2E. **Biome** for format/lint (with **oxlint** in this repo)
+- `queryKey` from a `queryKeys` factory only — no inline keys in components
+- Mutations: `invalidateQueries` by key, not ad-hoc refetch
 
-# Stack conventions (non-negotiable)
-- Every API response is parsed through a Zod schema. Infer TS types from schemas via `z.infer`, never hand-write duplicate types.
-- TanStack Query `queryKey` is a readonly tuple exported from a `queryKeys` factory. Never inline query keys in components.
-- Zustand stores hold ONLY client state (UI, session, preferences). Server data lives in TanStack Query cache. If you find yourself caching fetched data in Zustand, that's a bug.
-- Selectors for Zustand: always use selector functions to avoid over-rendering (`useStore(s => s.user)`, not `useStore().user`).
-- Mutations invalidate queries by key, not by refetch. Use `queryClient.invalidateQueries`.
+# Agents
+- **Architect / critic / reviewer:** read-only
+- **Builder:** implements `src/`, `tests/`; full verify before “done”
+- Blocked → escalate to Lead; max two silent retries
 
-# Coordination rules for teammates
-- Architect/Critic/Reviewer: READ ONLY. Never edit source files.
-- Builder: owns src/ and tests/. Runs full verification before signalling done.
-- When blocked, message the Lead. Never silently retry more than twice.
-
-# Shared agent config (Cursor + Claude Code)
-**Canonical** configuration lives only under **`.ai-rules/`** (`skills/`, `rules/`, `commands/`, `agents/`, `mcp.json`). Folders in `.cursor/` and `.claude/` are **symlinks** to those trees (not duplicate files). If links are missing after a clone, run **`pnpm run ai-rules:link`** (also runs on **`postinstall`**). See **`.ai-rules/README.md`**. **`.claude/settings.local.json`** is local and not part of the shared tree.
+# Config layout
+- **Source of truth:** `.ai-rules/` only (skills, rules, commands, agents, `mcp.json`)
+- `.cursor` / `.claude` = symlinks; missing → `pnpm run ai-rules:link` (also `postinstall`)

@@ -3,29 +3,19 @@ description: Run the full plan→test→build→review pipeline
 ---
 Feature spec: $ARGUMENTS
 
-You are the Lead. Execute this pipeline:
+You are the **Lead**. Same **branch** rules as `ship-light`: default **new** branch from updated default; never stack unrelated work on a merged branch; unmerged = same feature only, else new branch. Doubt → new branch.
 
-**Branch (kickoff):** Before step 1, choose where this spec lands. **Default: create a new branch** from the updated default (`git fetch origin && git switch main`, align with the remote, then `git switch -c <user>/<new-topic>`). **If the current branch’s PR is merged,** you must not stack new work on it; branch fresh from `main`. **If the current branch is unmerged,** decide whether the new spec is the **same feature / same open PR** or **unrelated**. Unrelated (new feature, different area, different review story) ⇒ **new branch** from updated default, even with an open PR on the other branch. Same feature, natural follow-up for the same open PR ⇒ you may keep the current branch. **When in doubt, new branch.**
+**UI + Chrome MCP:** For UI/routing changes, **chrome-devtools-verify** when MCP works; if not, document in **Verification** — not an automatic `reviewer` **BLOCK** if explained.
 
-**UI / route + Chrome MCP (conditional):** For production UI or routing changes (see **CLAUDE.md**), run **chrome-devtools-verify** **when Chrome DevTools MCP is working**. If MCP is not available, document that in **Verification** and continue — not a hard blocker. **`reviewer`** may **note** missing browser evidence when MCP was likely available but should not **BLOCK** solely for that.
+0. (Branch — see `ship-light` one-liner above.)
 
-1. Spawn `architect` with the spec. Await plan.
-2. Spawn `critic` to review plan. If BLOCK, loop to step 1 with critic's notes (max 2 rounds, then escalate).
-3. Spawn `builder` with approved plan. Instruct: Phase 1 only (write tests).
-4. Spawn `critic` to review tests. If BLOCK, send notes to builder (max 2 rounds, then escalate).
-5. Instruct `builder` to proceed to Phase 2 (implement) and Phase 3 (verify). Phase 3 includes: fallow audit (must not be `fail`); **Chrome DevTools MCP** (full **chrome-devtools-verify** checklist) **when MCP is working** and the change touches UI/routes; **drizzle-db-verify** when `db/`, `server/`, or migrations change. When browser verification runs, save **`take_screenshot`** with **`filePath`** under **`verification/<branch-or-ticket>/`** for step 6 and **`scripts/pr-comment-verify-gist.sh`** (step 9). If UI changed but MCP cannot run, builder notes that and still completes Phase 3 on fallow + tests.
-6. **Verification report (required):** After builder signals Phase 3, the Lead should run or confirm **chrome-devtools-verify** **when MCP is working** and UI/routes changed. The Lead must:
-   - Confirm `/ship-report` was opened when nav, routes, or ship workflow are in scope (if using browser MCP).
-   - When MCP was used: screenshots under `verification/<branch-or-ticket>/` for **happy path** and **error/empty** where applicable, plus feature URLs from the spec.
-   - Paste the **PR blurb template** from `/ship-report` (or equivalent) into the handoff. **If MCP was unavailable:** state that under **Verification** — automated tests still count. On-disk paths under `verification/…` feed step 9’s gist script.
-7. After builder signals done, run `pnpm fallow audit --format json` yourself. If verdict is `fail`, send findings back to builder (max 1 round).
-8. Spawn `reviewer` on the final diff. If BLOCK, send notes to builder (max 1 round — reviewer-blocked fixes should be small).
-9. If approved: commit, push the worktree branch, then open a PR or reuse an **open, unmerged** one **only** when the branch matches the spec (see **Branch (kickoff)**):
-   - **`gh pr create`** with the reviewer’s description **including the verification report** and the **local** screenshot paths under `verification/…` (for traceability). If you stayed on the current branch for the **same** open PR, use **`gh pr view --json number`** for `<PR_NUMBER>`. Merged previous PR, unrelated work, or wrong scope for the open PR ⇒ **new branch** + **`gh pr create`**; do not extend a merged PR or mix features in one PR.
-   - **Inline images on the PR (no binary commits):** When the change touched **UI or routes** and there are **image files on disk** from verification (typically under `verification/<branch-or-ticket>/`), run from the repo root—**once**, with **all** images in a single invocation so one comment holds the full set:
-     ```bash
-     scripts/pr-comment-verify-gist.sh <PR_NUMBER> path/to/first.png [path/to/second.png ...]
-     ```
-     Requires **`gh` authenticated** (`gh auth login`). Default gist is **secret (unlisted)**; set **`VERIFY_GIST_PUBLIC=1`** only if you need a **public** gist. **Do not** `git add` those verification images unless the user explicitly wants them in the repo. Details and manual fallback: **chrome-devtools-verify** skill (“PR thread only — gist + `gh`”).
-   - If there are **no** screenshots on disk, **skip** the gist script; **Verification** should still describe what ran (browser MCP or tests only). For **backend-only** changes, skip the gist script.
-10. If any agent escalates or exceeds retry budget, stop and summarize state.
+1. `architect` → plan.  
+2. `critic` on plan — BLOCK? refine (max 2 rounds, then escalate).  
+3. `builder` Phase 1 — tests only.  
+4. `critic` on tests — same loop.  
+5. `builder` Phase 2–3: implement, fallow, DevTools (UI, MCP up), **drizzle-db-verify** if db/server/migrations, screenshots `verification/…` for step 9.  
+6. **Lead:** Confirm verification when MCP + UI; `/ship-report` if nav/ship in scope; PR blurb. No MCP → note in **Verification**.  
+7. `pnpm fallow audit --format json` — `fail` → one builder round.  
+8. `reviewer` — BLOCK? one small fix round.  
+9. **Commit / push / PR** — `gh pr create` with report + `verification/…` paths, or `gh pr view` if **open** same-scope PR. UI + images on disk: `scripts/pr-comment-verify-gist.sh` once with all images. No screenshots → still describe in **Verification**. Backend-only → no gist.  
+10. Escalation / budget exceeded → stop, summarize.
