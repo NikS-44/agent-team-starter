@@ -140,8 +140,9 @@ export {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
-  DialogPortal,
   DialogTitle,
   DialogTrigger,
 };
+
+/** @public Re-exported for custom dialog compositions (shadcn portal + overlay pattern). */
+export { DialogOverlay, DialogPortal };

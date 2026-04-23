@@ -1,10 +1,10 @@
-export type ShipReportImage = {
+type ShipReportImage = {
   src: string;
   alt: string;
   caption: string;
 };
 
-export type ShipReportReprompt = {
+type ShipReportReprompt = {
   id: string;
   label: string;
   description: string;
