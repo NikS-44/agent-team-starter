@@ -3,35 +3,22 @@ description: Fast ship — fewer subagents, with verification report step
 ---
 Feature spec: $ARGUMENTS
 
-You are the Lead. Use this path for small or well-scoped work and when you want **fast models** with minimal orchestration. It trades the full `/ship` review loops for speed; escalate to full `/ship` if the spec is large, risky, or ambiguous.
+You are the **Lead** for small, well-scoped work. Faster than full `/ship`; use `/ship` if the spec is large, unclear, or high-risk.
 
-**Not included vs `/ship`:** plan critic, test critic, and the `reviewer` subagent (unless you add a manual skim).
+**vs `/ship`:** no plan critic, test critic, or `reviewer` (unless you skim yourself).
 
-**Branch (kickoff — before plan/build):** **Default: a new branch** from the updated default (`git fetch origin && git switch main` then `git pull` or, if `main` is only behind the remote, `git reset --hard origin/main` when you have no local-only commits to keep, then `git switch -c <user>/<new-topic>`). **If the current branch’s PR is merged** (e.g. `gh pr list --head "$(git branch --show-current)" --state merged` is non-empty, or the user said the old PR merged), you must create that new branch; do not add new work on the merged line. **If the current branch is unmerged,** still ask whether the **new spec belongs in the same PR and the same feature** as what is already on the branch. Unrelated or parallel product work ⇒ **new branch** from updated default, even if the open PR is still in flight (avoid mixing review threads). Same feature, follow-ups, and the open PR is meant to grow with the spec ⇒ you may keep the current branch. **When in doubt, use a new branch.**
+**Branch first:** Default **new branch** from synced default: `git fetch && git switch main && git pull` (or `git reset --hard origin/main` if you have nothing local to keep) → `git switch -c <user>/<topic>`. If this branch’s PR is **merged**, never add more work here. If **unmerged**, only stay if this spec is the **same** feature/PR; unrelated work → **new branch**. Doubt → new branch. (`gh pr list --head "$(git branch --show-current)" --state merged` shows merged work.)
 
-**UI / route + Chrome MCP (conditional):** If the diff touches production UI or routing (see **CLAUDE.md** — typically `src/pages/**`, `src/components/**`, `src/router.ts`, shell layout, `src/index.css`; **not** changes confined to tests/mocks alone), then **when Chrome DevTools MCP is connected and working**, run **chrome-devtools-verify** in step 5 (Lead and/or builder) and capture screenshots under `verification/…`. **If MCP is not available** in this session, document that in the PR **Verification** section and proceed — Vitest/build/fallow still gate quality; browser checks are **expected when MCP works**, not an absolute blocker.
+**UI + Chrome MCP:** If the diff touches app UI or routing (see `CLAUDE.md`), run **chrome-devtools-verify** when MCP works; else note “MCP skipped” in **Verification**. Tests + fallow still gate.
 
-**Tools & memory**
+**Tools:** `/memory` if repeating prefs. Fallow: MCP (`fallow_audit`…) when available. Builder handoff: Fallow in loop; **drizzle-db-verify** for db/server; UI routes → DevTools + screenshots under `verification/<branch-or-ticket>/` for the gist script (step 7). Optional: auto-memory or tiny `CLAUDE.md` after recurring pitfalls.
 
-- **`/memory`:** At kickoff, use it when the spec might repeat a past correction or preference; confirm which `CLAUDE.md` / rules loaded. After a successful PR, persist durable learnings via auto memory or a minimal `CLAUDE.md` edit (keep both tight).
-- **Fallow:** Prefer **Fallow MCP** tools (`fallow_audit`, `fallow_health`, `fallow_dead_code`) per `CLAUDE.md` instead of relying only on `pnpm fallow` CLI when those tools are available—especially in step 4.
-- **Research:** Optional `architect` already has **WebFetch**. The Lead may use web research / fetch tools when the spec depends on external APIs or documentation.
-- **Builder handoff:** In your single builder message, require Fallow MCP for audit/dead-code/health loops when available; Phase 3 **Chrome DevTools** for UI/routes **when MCP is working** (otherwise note MCP skipped); **drizzle-db-verify** when DB/server/schema changes; when browser MCP runs, require **`take_screenshot`** with **`filePath`** under **`verification/<branch-or-ticket>/`** so the Lead can use the gist script (step 7). Ask for a short auto-memory or `CLAUDE.md` note if the work surfaced a recurring pitfall—before signalling done.
-
-Pipeline:
-
-1. **Plan (inline):** Write a short plan: goal, files to touch, main risks (bullets only). Spawn `architect` **once** only if the spec is unclear; there is **no** `critic` round-trip on the plan.
-2. **Build:** Spawn `builder` **once** with: implement the plan, write or update tests alongside the code (TDD when natural), match `CLAUDE.md`, run `pnpm typecheck && pnpm lint && pnpm test && pnpm build` before signalling done, and for **UI / route work** complete Phase 3 in `.ai-rules/agents/builder.md` (fallow + **Chrome DevTools MCP when it is working** — see builder 3b) before signalling done.
-3. **Lead sanity check:** If builder’s tree is not green, send **at most one** short fix round to `builder` (same budget as a single reviewer pass in full `/ship`).
-4. **Fallow:** Run audit yourself via **Fallow MCP** (`fallow_audit`) or `pnpm fallow audit --format json`. If verdict is `fail`, fix with `builder` **or** stop and recommend full `/ship`.
-5. **Verification report (UI / route changes):** When the diff touches UI or routes **and Chrome DevTools MCP is working**, you (the Lead) should run or spot-check **chrome-devtools-verify**: screenshots under `verification/<branch-or-ticket>/`, console/network per CLAUDE.md, **`/ship-report`** when nav or ship workflow is in scope. **Always** add a “Verification” section to the PR body. On-disk paths feed step 7’s gist script. **If MCP is not available**, state that plainly in **Verification** and rely on automated tests — still ship if fallow/tests/build are green.
-6. **Lead diff review (no `reviewer` agent):** Skim the diff for `CLAUDE.md` basics (Zod at API boundaries, query key factory, no `any` / stray `console.log`, tests for happy + error/empty where relevant).
-7. If the above passes: commit, push the worktree branch, then open or reuse a **still-open** PR:
-   - **`gh pr create`** (or use the existing **open, unmerged** PR when you stayed on the same branch for the **same** feature — `gh pr view --json number`) with a concise title and body that **includes the verification report** and the **local** screenshot paths under `verification/…` (for traceability). No reviewer-generated prose. Merged previous PR or unrelated new work ⇒ you should be on a **new** branch (see **Branch** above) and **`gh pr create`**; do not hijack a merged PR or one whose scope is the wrong feature.
-   - **Inline images on the PR (no binary commits):** When the change touched **UI or routes** and there are **PNG (or other) image files on disk** from step 5 (typically under `verification/<branch-or-ticket>/`), run from the repo root—**once**, with **all** images in a single invocation so one comment holds the full set:
-     ```bash
-     scripts/pr-comment-verify-gist.sh <PR_NUMBER> path/to/first.png [path/to/second.png ...]
-     ```
-     Requires **`gh` authenticated** (`gh auth login`). Default gist is **secret (unlisted)**; set **`VERIFY_GIST_PUBLIC=1`** only if you need a **public** gist. **Do not** `git add` those verification images unless the user explicitly wants them in the repo. Details and manual fallback: **chrome-devtools-verify** skill (“PR thread only — gist + `gh`”).
-   - If there are **no** screenshot files on disk (MCP unused or unavailable), **skip** the gist script; the PR **Verification** section should still say what was checked (browser or tests only). If the change is **backend-only**, skip the gist script.
-8. If you would exceed one builder fix round or fallow stays failing after one attempt, **stop** and summarize; suggest full `/ship`.
+**Pipeline**
+1. **Plan** — Short bullets: goal, files, risks. `architect` only if spec is fuzzy. No plan critic.
+2. **Build** — One `builder` pass: implement, tests, `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, UI per `agents/builder.md` Phase 3 (fallow + DevTools if MCP up).
+3. **Lead fix** — At most one follow-up to `builder` if not green.
+4. **Fallow** — `fallow_audit` or `pnpm fallow audit --format json`. `fail` → fix once or hand off to full `/ship`.
+5. **Verification (UI/routes + MCP)** — Optional spot-check: screenshots, console/network, `/ship-report` if relevant. PR body always has a **Verification** section. No MCP → say so; green tests can still ship.
+6. **Skim diff** — Zod at boundaries, query keys, no `any` / stray logs, tests for main paths.
+7. **Ship** — Commit, push, **open** PR (or add to an **open** PR only if same feature). **`gh pr create`** body includes verification + local paths under `verification/…`. Merged old PR or wrong scope → you should already be on a new branch. **Images:** for UI, if PNGs exist: `scripts/pr-comment-verify-gist.sh <PR#> a.png b.png` (needs `gh auth`; `VERIFY_GIST_PUBLIC=1` for public gist). Don’t `git add` verification PNGs unless asked. Gist and `gh` may reject raw binary — use script or browser-upload gist; see **chrome-devtools-verify**.
+8. Exceeded one fix round or fallow still `fail` after one try → **stop**; suggest `/ship`.

@@ -1,17 +1,29 @@
 # agent-team-starter
 
-Scaffolding for a Claude Code agent-team workflow targeting a React + Zustand + TanStack Query + Zod stack, with Chrome DevTools MCP verification.
+React + Vite + TanStack Query + Zod + Hono + SQLite, with a shared **`.ai-rules/`** tree for agents (skills, commands, agents, MCP). See `CLAUDE.md` for **definition of done** and stack rules.
 
-## Quick start
+## New machine (0 → 1)
 
-1. Install deps: `pnpm install`
-2. Install Chrome DevTools MCP: `claude mcp add chrome-devtools -s user -- npx chrome-devtools-mcp@latest`
-3. Ship a feature: `claude` then `/ship <feature description>` (full pipeline), or `/ship-light <feature description>` for a faster path with fewer subagents (see command file for tradeoffs)
-4. Verify current branch: `/verify [path]`
+1. **Install** [Node.js 20+](https://nodejs.org) and [pnpm](https://pnpm.io/installation) (`corepack enable` then `corepack prepare pnpm@latest --activate` works on many setups).
+2. **Clone and install**
+   ```bash
+   git clone <repo-url> && cd agent-team-starter
+   pnpm install
+   ```
+   `postinstall` runs `scripts/ensure-ai-rules-symlinks.mjs` so **`.cursor/`** and **`.claude/`** point at **`.ai-rules/`**. If symlinks are missing (some Windows checkouts), run `pnpm run ai-rules:link`.
+3. **Verify the toolchain**
+   ```bash
+   pnpm typecheck && pnpm test && pnpm build
+   ```
+4. **Run the app** — API + Vite: `pnpm dev` (or `pnpm dev:ready` to wait for ports, then `pnpm dev:stop` when done). Default UI: [http://localhost:5173](http://localhost:5173); API: [http://127.0.0.1:8787](http://127.0.0.1:8787).
+5. **Optional** — [GitHub CLI](https://cli.github.com) (`gh auth login` for PRs), Chrome DevTools MCP in Cursor (see `.ai-rules/mcp.json`), and any secrets in local-only files (e.g. **`.claude/settings.local.json`**, not committed).
 
-## Architecture
+## AI workflow (short)
 
-- `CLAUDE.md` — shared definition of done and stack conventions
-- `.ai-rules/` — only committed copy: **skills**, **rules** (`defaults.mdc`), **commands**, **agents**, **mcp**; see `.ai-rules/README.md`
-- `.cursor/*` and `.claude/*` (except local settings) — **symlinks** into `.ai-rules/`; recreated on **`pnpm i`** via `postinstall` if your Git checkout omits them
-- `scripts/dev-ready.sh` + `scripts/dev-stop.sh` — background dev server lifecycle
+| Goal | Command |
+|------|--------|
+| Full pipeline (plan → critic → test critic → build → review) | In Claude Code: `/ship <spec>` |
+| Smaller / fast path | `/ship-light <spec>` |
+| Browser-only smoke | `/verify [path]` |
+
+Details and tradeoffs: `.ai-rules/commands/ship.md`, `ship-light.md`, `verify.md`. Layout of skills/rules: **`.ai-rules/README.md`**.
