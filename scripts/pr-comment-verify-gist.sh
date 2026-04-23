@@ -28,16 +28,16 @@ for f in "${files[@]}"; do
   fi
 done
 
-public_flag=()
-if [[ "${VERIFY_GIST_PUBLIC:-}" == 1 ]]; then
-  public_flag=(--public)
-fi
-
 branch=$(git branch --show-current 2>/dev/null || echo "unknown")
 repo=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "unknown")
 desc="Verification for ${repo} PR #${pr} (branch: ${branch})"
 
-gist_out=$(gh gist create "${public_flag[@]}" -d "$desc" "${files[@]}")
+# macOS /bin/bash 3.2: empty array + set -u breaks "${arr[@]}"; branch instead of "${public_flag[@]}"
+if [[ "${VERIFY_GIST_PUBLIC:-}" == 1 ]]; then
+  gist_out=$(gh gist create --public -d "$desc" "${files[@]}")
+else
+  gist_out=$(gh gist create -d "$desc" "${files[@]}")
+fi
 gist_url=$(printf '%s\n' "$gist_out" | tail -n 1)
 if [[ ! "$gist_url" =~ https://gist\.github\.com/[^/]+/([a-f0-9]+)$ ]]; then
   echo "Could not parse gist URL from gh output:" >&2
