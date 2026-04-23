@@ -12,3 +12,8 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 .fallow/
+
+# SQLite (local dev DB + WAL mode sidecars — regenerate via migrate/seed, do not commit)
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
