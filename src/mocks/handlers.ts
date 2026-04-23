@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import { seedUsers } from "../../db/seed-data";
+import type { ShipVerifyResponse } from "../api/shipVerify.schemas";
 import type { User } from "../api/users.schemas";
 
 let userList: User[] = seedUsers.map((u) => ({ ...u }));
@@ -12,15 +13,45 @@ function resetList() {
 
 export { resetList as resetUserHandlersState };
 
+function parseMockUserBody(body: { name?: string; email?: string; role?: string }):
+  | { ok: true; name: string; email: string; role: "admin" | "member" }
+  | { ok: false; response: ReturnType<typeof HttpResponse.json> } {
+  if (!body.name?.trim() || !body.email || !["admin", "member"].includes(body.role ?? "")) {
+    return {
+      ok: false,
+      response: HttpResponse.json({ error: "Validation failed" }, { status: 400 }),
+    };
+  }
+  return {
+    ok: true,
+    name: body.name.trim(),
+    email: body.email,
+    role: body.role as "admin" | "member",
+  };
+}
+
 export const handlers = [
+  http.get("/api/ship-verify", () => {
+    const body: ShipVerifyResponse = {
+      ok: true,
+      checkedAt: new Date().toISOString(),
+      database: {
+        dialect: "sqlite",
+        usersTableReadable: true,
+        usersRowCount: userList.length,
+        drizzleMigrationsCount: 1,
+      },
+    };
+    return HttpResponse.json(body);
+  }),
+
   http.get("/api/users", () => HttpResponse.json(userList)),
 
   http.post("/api/users", async ({ request }) => {
     const body = (await request.json()) as { name?: string; email?: string; role?: string };
-    if (!body.name?.trim() || !body.email || !["admin", "member"].includes(body.role ?? "")) {
-      return HttpResponse.json({ error: "Validation failed" }, { status: 400 });
-    }
-    const email = String(body.email).toLowerCase();
+    const parsedBody = parseMockUserBody(body);
+    if (!parsedBody.ok) return parsedBody.response;
+    const email = parsedBody.email.toLowerCase();
     if (userList.some((u) => u.email === email)) {
       return HttpResponse.json(
         { error: "A user with this email already exists." },
@@ -30,9 +61,9 @@ export const handlers = [
     const id = globalThis.crypto.randomUUID();
     const user: User = {
       id,
-      name: body.name.trim(),
-      email: body.email,
-      role: body.role as "admin" | "member",
+      name: parsedBody.name,
+      email: parsedBody.email,
+      role: parsedBody.role,
     };
     userList = [...userList, user];
     return HttpResponse.json(user, { status: 201 });
@@ -48,10 +79,9 @@ export const handlers = [
       return HttpResponse.json({ error: "User not found." }, { status: 404 });
     }
     const body = (await request.json()) as { name?: string; email?: string; role?: string };
-    if (!body.name?.trim() || !body.email || !["admin", "member"].includes(body.role ?? "")) {
-      return HttpResponse.json({ error: "Validation failed" }, { status: 400 });
-    }
-    const email = String(body.email);
+    const parsedBody = parseMockUserBody(body);
+    if (!parsedBody.ok) return parsedBody.response;
+    const email = parsedBody.email;
     if (userList.some((u) => u.id !== id && u.email === email)) {
       return HttpResponse.json(
         { error: "A user with this email already exists." },
@@ -60,9 +90,9 @@ export const handlers = [
     }
     const next: User = {
       id,
-      name: body.name.trim(),
-      email: body.email,
-      role: body.role as "admin" | "member",
+      name: parsedBody.name,
+      email: parsedBody.email,
+      role: parsedBody.role,
     };
     const copy = [...userList];
     copy[i] = next;
