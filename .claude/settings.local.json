@@ -1,11 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/agents/architect.md ~/.claude/agents/architect.md)",
-      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/agents/critic.md ~/.claude/agents/critic.md)",
-      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/agents/builder.md ~/.claude/agents/builder.md)",
-      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/agents/reviewer.md ~/.claude/agents/reviewer.md)",
-      "Bash(cp /Users/nik/workplace/agent-team-starter/.claude/commands/ship.md ~/.claude/commands/ship.md)",
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.ai-rules/agents/architect.md ~/.claude/agents/architect.md)",
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.ai-rules/agents/critic.md ~/.claude/agents/critic.md)",
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.ai-rules/agents/builder.md ~/.claude/agents/builder.md)",
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.ai-rules/agents/reviewer.md ~/.claude/agents/reviewer.md)",
+      "Bash(cp /Users/nik/workplace/agent-team-starter/.ai-rules/commands/ship.md ~/.claude/commands/ship.md)",
       "Bash(pnpm install *)",
       "Bash(npm install *)",
       "Bash(pnpm approve-builds *)",

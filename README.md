@@ -12,7 +12,6 @@ Scaffolding for a Claude Code agent-team workflow targeting a React + Zustand + 
 ## Architecture
 
 - `CLAUDE.md` — shared definition of done and stack conventions
-- `.claude/agents/` — architect, critic, builder, reviewer
-- `.claude/commands/` — `/ship`, `/ship-light`, and `/verify`
-- `.cursor/commands/` — same commands for Cursor (project-local)
+- `.ai-rules/` — only committed copy: **skills**, **rules** (`defaults.mdc`), **commands**, **agents**, **mcp**; see `.ai-rules/README.md`
+- `.cursor/*` and `.claude/*` (except local settings) — **symlinks** into `.ai-rules/`; recreated on **`pnpm i`** via `postinstall` if your Git checkout omits them
 - `scripts/dev-ready.sh` + `scripts/dev-stop.sh` — background dev server lifecycle

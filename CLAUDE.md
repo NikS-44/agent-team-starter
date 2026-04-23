@@ -30,3 +30,6 @@
 - Architect/Critic/Reviewer: READ ONLY. Never edit source files.
 - Builder: owns src/ and tests/. Runs full verification before signalling done.
 - When blocked, message the Lead. Never silently retry more than twice.
+
+# Shared agent config (Cursor + Claude Code)
+**Canonical** configuration lives only under **`.ai-rules/`** (`skills/`, `rules/`, `commands/`, `agents/`, `mcp.json`). Folders in `.cursor/` and `.claude/` are **symlinks** to those trees (not duplicate files). If links are missing after a clone, run **`pnpm run ai-rules:link`** (also runs on **`postinstall`**). See **`.ai-rules/README.md`**. **`.claude/settings.local.json`** is local and not part of the shared tree.
