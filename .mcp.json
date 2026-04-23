@@ -1,10 +1,53 @@
 {
   "mcpServers": {
-    "fallow": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "chrome-devtools": {
       "type": "stdio",
       "command": "npx",
-      "args": ["fallow", "mcp"],
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--no-usage-statistics"
+      ],
       "env": {}
+    },
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${CLAUDE_PROJECT_DIR:-.}"
+      ],
+      "env": {}
+    },
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "env": {}
+    },
+    "memory": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "MEMORY_FILE_PATH": "${CLAUDE_PROJECT_DIR:-.}/.cursor/mcp-memory.jsonl"
+      }
+    },
+    "fallow": {
+      "type": "stdio",
+      "command": "pnpm",
+      "args": ["exec", "fallow-mcp"],
+      "env": {
+        "FALLOW_BIN": "${CLAUDE_PROJECT_DIR:-.}/node_modules/.bin/fallow"
+      }
     }
   }
 }

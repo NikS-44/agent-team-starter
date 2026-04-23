@@ -8,19 +8,11 @@
     },
     "chrome-devtools": {
       "command": "npx",
-      "args": [
-        "-y",
-        "chrome-devtools-mcp@latest",
-        "--no-usage-statistics"
-      ]
+      "args": ["-y", "chrome-devtools-mcp@latest", "--no-usage-statistics"]
     },
     "filesystem": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "${workspaceFolder}"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}"]
     },
     "sequential-thinking": {
       "command": "npx",
@@ -31,6 +23,13 @@
       "args": ["-y", "@modelcontextprotocol/server-memory"],
       "env": {
         "MEMORY_FILE_PATH": "${workspaceFolder}/.cursor/mcp-memory.jsonl"
+      }
+    },
+    "fallow": {
+      "command": "pnpm",
+      "args": ["exec", "fallow-mcp"],
+      "env": {
+        "FALLOW_BIN": "${workspaceFolder}/node_modules/.bin/fallow"
       }
     }
   }

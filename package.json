@@ -27,7 +27,9 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "prepare": "husky",
+    "precommit": "lint-staged && pnpm run fallow:audit"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -73,9 +75,7 @@
       "oxlint",
       "oxlint-tsgolint"
     ],
-    "ignoredBuiltDependencies": [
-      "fallow"
-    ]
+    "ignoredBuiltDependencies": ["fallow"]
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -94,7 +94,9 @@
     "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.10",
     "fallow": "^2.44.2",
+    "husky": "^9.1.7",
     "jsdom": "^25.0.1",
+    "lint-staged": "^16.4.0",
     "msw": "^2.7.0",
     "oxlint": "^1.61.0",
     "oxlint-tsgolint": "^0.21.1",
@@ -105,8 +107,6 @@
     "vitest": "^2.1.8"
   },
   "msw": {
-    "workerDirectory": [
-      "public"
-    ]
+    "workerDirectory": ["public"]
   }
 }
