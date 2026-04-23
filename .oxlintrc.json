@@ -16,5 +16,5 @@
     "typescript/ban-ts-comment": "error",
     "react-in-jsx-scope": "off"
   },
-  "ignorePatterns": ["dist/**", "node_modules/**", "public/mockServiceWorker.js"]
+  "ignorePatterns": ["dist/**", "node_modules/**", "public/mockServiceWorker.js", "drizzle/**"]
 }

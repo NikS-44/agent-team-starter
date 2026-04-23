@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { type RenderOptions, type RenderResult, render } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { createAppRouter } from "../router";
 
 export function createTestQueryClient(): QueryClient {
@@ -19,7 +20,11 @@ export function renderWithProviders(
 ): RenderResult & { queryClient: QueryClient } {
   const queryClient = options?.queryClient ?? createTestQueryClient();
   function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>{children}</TooltipProvider>
+      </QueryClientProvider>
+    );
   }
   const result = render(ui, { wrapper: Wrapper, ...options });
   return { ...result, queryClient };
@@ -35,7 +40,9 @@ export function renderWithRouter(opts?: {
   const testRouter = createAppRouter({ initialPath: opts?.initialPath ?? "/users" });
   const result = render(
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={testRouter} />
+      <TooltipProvider>
+        <RouterProvider router={testRouter} />
+      </TooltipProvider>
     </QueryClientProvider>
   );
   return { ...result, queryClient };

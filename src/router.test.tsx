@@ -17,4 +17,17 @@ describe("router", () => {
     renderWithRouter({ initialPath: "/" });
     await waitFor(() => expect(screen.getByText("Alice Admin")).toBeInTheDocument());
   });
+
+  it("renders PlaygroundPage at /playground", async () => {
+    renderWithRouter({ initialPath: "/playground" });
+    await waitFor(() => expect(screen.getByRole("heading", { name: /playground/i })).toBeInTheDocument());
+    expect(screen.getByText("Sortable list")).toBeInTheDocument();
+  });
+
+  it("renders AboutPage at /about", async () => {
+    renderWithRouter({ initialPath: "/about" });
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: /about this demo/i })).toBeInTheDocument()
+    );
+  });
 });

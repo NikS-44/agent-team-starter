@@ -1,4 +1,5 @@
 import { useUsers } from "../api/users";
+import { AddUserForm } from "../components/AddUserForm";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 import { UserCard } from "../components/UserCard";
 
@@ -15,17 +16,20 @@ export function UsersPage() {
     );
   }
 
-  if (data.length === 0) {
-    return <p className="p-4 text-gray-500">No users found.</p>;
-  }
-
   return (
-    <ul className="space-y-3">
-      {data.map((user) => (
-        <li key={user.id}>
-          <UserCard user={user} />
-        </li>
-      ))}
-    </ul>
+    <div>
+      <AddUserForm />
+      {data.length === 0 ? (
+        <p className="text-gray-500 dark:text-gray-400">No users yet. Add one above.</p>
+      ) : (
+        <ul className="space-y-3">
+          {data.map((user) => (
+            <li key={user.id}>
+              <UserCard user={user} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

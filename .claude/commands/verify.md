@@ -20,7 +20,7 @@ Steps:
 4. When Builder returns:
    - Run `pnpm dev:stop`
    - Summarize findings: console status, network status, screenshots, any performance insights
-   - If Builder found issues, list them as a checklist but do not fix them (that's a separate /ship or /quick run)
+   - If Builder found issues, list them as a checklist but do not fix them (that's a separate `/ship` or `/ship-light` run)
 
 Hard rules:
 - This command never edits files. If verification reveals bugs, report them and exit — do not attempt fixes.
