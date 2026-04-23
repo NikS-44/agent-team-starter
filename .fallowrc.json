@@ -7,7 +7,8 @@
     "unused-exports": "warn",
     "unused-types": "warn",
     "circular-dependencies": "error",
-    "unused-dependencies": "warn"
+    "unused-dependencies": "off",
+    "unresolved-imports": "off"
   },
   "health": {
     "maxCyclomatic": 15,

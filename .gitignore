@@ -6,7 +6,8 @@ dist
 .dev-server.log
 .env
 .env.local
-data/
+# Local DB or app data at repo root only (not src/data/)
+/data/
 .claude/worktrees/
 playwright-report/
 test-results/
