@@ -1,4 +1,4 @@
-import { UsersPage } from "./pages/UsersPage";
+import { Outlet } from "@tanstack/react-router";
 import { useUiStore } from "./store/uiStore";
 
 export function App() {
@@ -28,7 +28,7 @@ export function App() {
         </button>
       </header>
       <main className="p-4">
-        <UsersPage />
+        <Outlet />
       </main>
     </div>
   );

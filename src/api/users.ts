@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
-export const UserSchema = z.object({
+const UserSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   email: z.string().email(),
   role: z.enum(["admin", "member"]),
 });
 
-export const UsersResponseSchema = z.array(UserSchema);
+const UsersResponseSchema = z.array(UserSchema);
 
 export type User = z.infer<typeof UserSchema>;
 
