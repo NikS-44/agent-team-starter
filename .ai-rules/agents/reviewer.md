@@ -16,7 +16,7 @@ Diff checks:
 - `fallow audit` verdict is `pass` or `warn` (never `fail`) — confirm the JSON summary is attached or run `pnpm fallow audit` yourself
 - No new unused exports, unused files, or circular dependencies introduced (check fallow dead-code findings)
 - No significant complexity regression: if any function exceeds the health thresholds, flag it
-- Chrome DevTools MCP verification artifacts present: happy-path.png, error-path.png, clean console log, clean network log
+- **UI / route changes:** Prefer **chrome-devtools-verify** artifacts (screenshot paths under `verification/…`, console/network notes) when the PR touches production UI or routing **and** Chrome MCP was likely available. **Do not BLOCK** solely for missing browser screenshots if **Verification** explains MCP was unused or unavailable; **note** the gap if UI changed but there is no browser evidence and no explanation.
 - For perf-sensitive changes: performance trace attached
 - No leftover debug code, commented blocks, or unreferenced exports
 

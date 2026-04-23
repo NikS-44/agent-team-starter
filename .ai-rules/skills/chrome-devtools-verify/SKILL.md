@@ -12,6 +12,10 @@ description: >-
 
 Use this workflow to **prove** a feature in a real browser and **document** what shipped. The running app already uses this repo’s layout and `src/components/ui` — screenshots of feature routes *are* evidence of those components in context.
 
+## Policy (this repo)
+
+For **UI / route changes**, agents should run this skill **when Chrome DevTools MCP is working**. If MCP is not available, document that in the PR **Verification** section and rely on Vitest/build; **`reviewer`** should not treat missing browser artifacts as an automatic **BLOCK** if that is explained.
+
 ## Prerequisites
 
 1. **MCP server** — `chrome-devtools` must be enabled (canonical config: `.ai-rules/mcp.json`, symlinked as `.cursor/mcp.json` with `chrome-devtools-mcp`). If you see a profile lock error, the project config includes `--isolated=true`; reload MCP servers after changing config. **In Claude Code**, MCP server names may differ from Cursor’s—use the id your environment’s MCP listing exposes.
