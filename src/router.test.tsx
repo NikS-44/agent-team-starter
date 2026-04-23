@@ -54,7 +54,7 @@ describe("router", () => {
   it("renders ShipReportPage at /ship-report", async () => {
     renderWithRouter({ initialPath: "/ship-report" });
     await waitFor(() =>
-      expect(screen.getByRole("heading", { name: /ship verification/i })).toBeInTheDocument()
+      expect(screen.getByRole("heading", { name: /ship report/i })).toBeInTheDocument()
     );
   });
 });
