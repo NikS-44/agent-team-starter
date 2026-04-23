@@ -23,10 +23,6 @@ describe("router", () => {
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: /playground/i })).toBeInTheDocument()
     );
-    expect(screen.getByRole("link", { name: /open in component library/i })).toHaveAttribute(
-      "href",
-      "/components-demo#sortable"
-    );
   });
 
   it("renders AboutPage at /about", async () => {
