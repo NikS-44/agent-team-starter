@@ -33,8 +33,8 @@ Run **before** browser or live API checks:
    - `fail`: fix new dead code / duplication / complexity before marking done. Do **not** skip this.
 2. Attach the audit JSON summary to the mailbox when reporting verification.
 
-**3b — Chrome DevTools MCP (frontend-affecting changes only)**  
-Use when the diff touches **user-visible UI or app routing**, e.g. `src/pages/**`, `src/components/**`, `src/router.ts`, shell/nav, `src/index.css`, or client-only assets that affect the UI. **Do not** require Chrome MCP for backend-only work.
+**3b — Chrome DevTools MCP (when UI changes and MCP works)**  
+When the diff touches **user-visible UI or app routing** (see **CLAUDE.md**: `src/pages/**`, `src/components/**`, `src/router.ts`, shell/nav, `src/index.css`, etc.; **not** changes confined to tests/mocks alone), **and Chrome DevTools MCP is available and connected in your environment**, complete the **chrome-devtools-verify** checklist before signalling done. **If MCP is unavailable or failing** after a quick attempt, say so in your handoff and finish Phase 3 with fallow + tests — do not block the Lead on browser work. **Skip 3b** for backend-only diffs (no production UI/routing files touched).
 
 Prerequisites:
 - Start and wait: `pnpm dev:ready`; on completion or error always `pnpm dev:stop`
@@ -52,5 +52,5 @@ Hard rules:
 - Never cache server data in Zustand.
 - Never inline a queryKey — always import from the queryKeys factory.
 - Max 5 implementation attempts per test, then escalate.
-- **Chrome DevTools MCP:** required **only when 3b applies**. If 3b applies and MCP is unavailable or cannot connect, escalate — do not claim UI verification complete.
+- **Chrome DevTools MCP:** run **when 3b would apply and MCP is working**; if MCP is down, document and complete Phase 3 with fallow + automated tests.
 - **DB/API:** when **3c** applies, do not mark done until tests are green **and** live API smoke (drizzle-db-verify) is documented.
