@@ -29,6 +29,8 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx scripts/seed.ts",
     "prepare": "husky",
+    "postinstall": "node scripts/ensure-ai-rules-symlinks.mjs",
+    "ai-rules:link": "node scripts/ensure-ai-rules-symlinks.mjs",
     "precommit": "lint-staged && pnpm run fallow:audit"
   },
   "lint-staged": {

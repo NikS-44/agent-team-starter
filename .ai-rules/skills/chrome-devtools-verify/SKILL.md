@@ -14,7 +14,7 @@ Use this workflow to **prove** a feature in a real browser and **document** what
 
 ## Prerequisites
 
-1. **MCP server** — `chrome-devtools` must be enabled (e.g. `.cursor/mcp.json` with `chrome-devtools-mcp`). If you see a profile lock error, the project config includes `--isolated=true`; reload MCP servers after changing config.
+1. **MCP server** — `chrome-devtools` must be enabled (canonical config: `.ai-rules/mcp.json`, symlinked as `.cursor/mcp.json` with `chrome-devtools-mcp`). If you see a profile lock error, the project config includes `--isolated=true`; reload MCP servers after changing config. **In Claude Code**, MCP server names may differ from Cursor’s—use the id your environment’s MCP listing exposes.
 2. **Tool names** — Before the first call, **read the MCP tool descriptors** under the workspace `mcps/` folder (or your IDE’s MCP listing). Server id may appear as `user-chrome-devtools` or similar — use the id your environment exposes.
 3. **Dev server** — Start the app (`pnpm dev`, or `pnpm dev:ready` if your team uses the ready script). Note the **Vite URL** from the log (e.g. `http://localhost:5173` — port may differ).
 4. **Schema first** — Never guess `call_mcp_tool` parameters; open the tool’s JSON descriptor and pass only supported fields.

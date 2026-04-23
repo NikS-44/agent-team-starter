@@ -1,0 +1,10 @@
+---
+description: Pointers to shared .ai-rules, CLAUDE.md, and one-tree layout; edit canonical files in .ai-rules only.
+alwaysApply: true
+---
+
+# Shared agent context
+
+- **Principles, stack, and DoD** — see root `CLAUDE.md`.
+- **Single source of truth:** all shared skills, rules, commands, agents, and MCP config live under **`.ai-rules/`** only. The `.cursor` and `.claude` tool folders contain **no duplicate copies**—each of `skills/`, `rules/`, `commands/`, and (for agents) the whole `agents/` directory is a **symbolic link** to the matching folder under `.ai-rules/` (plus `.cursor/mcp.json` → `.ai-rules/mcp.json`).
+- **If links are missing** after a clone, run `pnpm run ai-rules:link` (also runs on `postinstall`).
