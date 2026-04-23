@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import {
   DndContext,
   type DragEndEvent,
@@ -17,8 +18,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 import * as React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 
 const defaultItems = [
   { id: "1", label: "Plan the feature" },
@@ -60,7 +59,7 @@ function SortableRow({ item }: { item: Item }) {
   );
 }
 
-export function PlaygroundSortable() {
+export function SortableListDemo() {
   const [items, setItems] = React.useState(defaultItems);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -79,27 +78,16 @@ export function PlaygroundSortable() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Sortable list</CardTitle>
-        <CardDescription>
-          Drag the grip to reorder. Built with <span className="font-mono text-xs">@dnd-kit</span>{" "}
-          + shadcn.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-          <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
-            <ul className="list-none space-y-2" aria-label="Sortable task list">
-              {items.map((item) => (
-                <li key={item.id}>
-                  <SortableRow item={item} />
-                </li>
-              ))}
-            </ul>
-          </SortableContext>
-        </DndContext>
-      </CardContent>
-    </Card>
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+      <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+        <ul className="list-none space-y-2" aria-label="Sortable task list">
+          {items.map((item) => (
+            <li key={item.id}>
+              <SortableRow item={item} />
+            </li>
+          ))}
+        </ul>
+      </SortableContext>
+    </DndContext>
   );
 }

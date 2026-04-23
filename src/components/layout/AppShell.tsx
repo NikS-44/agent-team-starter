@@ -1,6 +1,3 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { Info, LayoutGrid, Moon, Sun, Users } from "lucide-react";
-import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -17,14 +14,30 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useUiStore } from "@/store/uiStore";
 import { cn } from "@/lib/utils";
+import { useUiStore } from "@/store/uiStore";
+import { Link, useRouterState } from "@tanstack/react-router";
+import {
+  ClipboardList,
+  Info,
+  LayoutDashboard,
+  LayoutGrid,
+  Moon,
+  PanelsTopLeft,
+  Sun,
+  Users,
+} from "lucide-react";
+import * as React from "react";
 
-const mainNav: { to: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { to: "/users", label: "Users", icon: Users },
-  { to: "/playground", label: "Playground", icon: LayoutGrid },
-  { to: "/about", label: "About", icon: Info },
-];
+const mainNav: { to: string; label: string; icon: React.ComponentType<{ className?: string }> }[] =
+  [
+    { to: "/users", label: "Users", icon: Users },
+    { to: "/playground", label: "Playground", icon: LayoutGrid },
+    { to: "/components-demo", label: "Components", icon: PanelsTopLeft },
+    { to: "/dashboard-demo", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/ship-report", label: "Ship report", icon: ClipboardList },
+    { to: "/about", label: "About", icon: Info },
+  ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -87,10 +100,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <div
-          className={cn(
-            "min-h-svh max-w-full flex-1 p-4 md:p-6",
-            "bg-background text-foreground"
-          )}
+          className={cn("min-h-svh max-w-full flex-1 p-4 md:p-6", "bg-background text-foreground")}
         >
           {children}
         </div>

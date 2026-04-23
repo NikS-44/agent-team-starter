@@ -7,7 +7,10 @@ import {
 } from "@tanstack/react-router";
 import { App } from "./App";
 import { AboutPage } from "./pages/AboutPage";
+import { ComponentsDemoPage } from "./pages/ComponentsDemoPage";
+import { DashboardDemoPage } from "./pages/DashboardDemoPage";
 import { PlaygroundPage } from "./pages/PlaygroundPage";
+import { ShipReportPage } from "./pages/ShipReportPage";
 import { UsersPage } from "./pages/UsersPage";
 
 const rootRoute = createRootRoute({ component: App });
@@ -40,7 +43,33 @@ const aboutRoute = createRoute({
   component: AboutPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, usersRoute, playgroundRoute, aboutRoute]);
+const componentsDemoRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/components-demo",
+  component: ComponentsDemoPage,
+});
+
+const dashboardDemoRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dashboard-demo",
+  component: DashboardDemoPage,
+});
+
+const shipReportRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/ship-report",
+  component: ShipReportPage,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  usersRoute,
+  playgroundRoute,
+  componentsDemoRoute,
+  dashboardDemoRoute,
+  shipReportRoute,
+  aboutRoute,
+]);
 
 export function createAppRouter(opts?: { initialPath?: string }) {
   return createRouter({
