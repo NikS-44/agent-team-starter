@@ -9,3 +9,5 @@ dist
 .claude/worktrees/
 playwright-report/
 test-results/
+*.tsbuildinfo
+.fallow/

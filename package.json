@@ -6,41 +6,62 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "biome check .",
-    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src --config .oxlintrc.json",
+    "lint:ts": "tsgolint src",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "typecheck": "tsgo --noEmit",
+    "typecheck:tsc": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "dev:ready": "bash scripts/dev-ready.sh",
-    "dev:stop": "bash scripts/dev-stop.sh"
+    "dev:stop": "bash scripts/dev-stop.sh",
+    "fallow": "fallow",
+    "fallow:audit": "fallow audit",
+    "fallow:dead": "fallow dead-code",
+    "fallow:health": "fallow health"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.62.0",
+    "@tanstack/react-router": "1.168.23",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "@tanstack/react-query": "^5.62.0",
-    "zustand": "^5.0.2",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^5.0.2"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@biomejs/biome", "esbuild", "msw"]
+    "onlyBuiltDependencies": [
+      "@biomejs/biome",
+      "@typescript/native-preview",
+      "esbuild",
+      "msw",
+      "oxlint",
+      "oxlint-tsgolint"
+    ],
+    "ignoredBuiltDependencies": ["fallow"]
   },
   "devDependencies": {
-    "vite": "^6.0.5",
-    "@vitejs/plugin-react": "^4.3.4",
-    "typescript": "^5.7.2",
+    "@biomejs/biome": "^1.9.4",
+    "@playwright/test": "^1.49.1",
+    "@tailwindcss/vite": "^4.0.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
-    "vitest": "^2.1.8",
+    "@typescript/native-preview": "latest",
+    "@vitejs/plugin-react": "^4.3.4",
     "@vitest/coverage-v8": "^2.1.8",
-    "@testing-library/react": "^16.1.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/user-event": "^14.5.2",
+    "fallow": "^2.44.2",
     "jsdom": "^25.0.1",
     "msw": "^2.7.0",
-    "@playwright/test": "^1.49.1",
-    "@biomejs/biome": "^1.9.4",
+    "oxlint": "^1.61.0",
+    "oxlint-tsgolint": "^0.21.1",
     "tailwindcss": "^4.0.0",
-    "@tailwindcss/vite": "^4.0.0"
+    "typescript": "^6.0.3",
+    "vite": "^6.0.5",
+    "vitest": "^2.1.8"
   },
   "msw": {
     "workerDirectory": ["public"]

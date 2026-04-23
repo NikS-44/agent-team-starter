@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "vitest"],
+  "settings": {
+    "react": {
+      "version": "18"
+    }
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "no-console": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/ban-ts-comment": "error",
+    "react-in-jsx-scope": "off"
+  },
+  "ignorePatterns": ["dist/**", "node_modules/**", "public/mockServiceWorker.js"]
+}

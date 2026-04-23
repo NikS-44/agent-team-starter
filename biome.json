@@ -3,15 +3,8 @@
   "files": {
     "ignore": ["public/mockServiceWorker.js", "dist/**"]
   },
-  "organizeImports": {
-    "enabled": true
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true
-    }
-  },
+  "organizeImports": { "enabled": true },
+  "linter": { "enabled": false },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
