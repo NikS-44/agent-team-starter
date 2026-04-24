@@ -1,8 +1,11 @@
 import type { ShipReport } from "./shipReportsTypes";
 
 /**
- * In-app “what we shipped” narratives. To add a run: put PNGs under
- * `public/ship-reports/<slug>/`, then append a new object here.
+ * In-app “what we shipped” narratives.
+ *
+ * - Gallery images: `public/ship-reports/<slug>/` + `images[]` here.
+ * - **Master vs branch** evidence: `public/screenshots/<slug>/` (`before` / `after` captures) +
+ *   `branchEvidence` below.
  */
 export const SHIP_REPORTS: ShipReport[] = [
   {
@@ -23,6 +26,23 @@ export const SHIP_REPORTS: ShipReport[] = [
           "In agent-team-starter, describe how `pnpm fallow audit` is meant to be used from CLAUDE.md, then list what you would run after merging a feature that touched `AllComponentsShowcase.tsx` and why.",
       },
     ],
+  },
+  {
+    id: "local-evidence-template",
+    menuLabel: "Local evidence (template)",
+    title: "Branch vs main + committed screenshots",
+    summary: [
+      "This entry demonstrates **branchEvidence**: large **before** (baseline) and **after** (feature) images under `public/screenshots/local-evidence-template/`. The visual delta is the review surface—no committed patch file.",
+      "Replace the SVG placeholders with real **before.png** / **after.png** full-page captures (same URL and viewport); update `beforeSrc` / `afterSrc` in `shipReports.ts` when you switch to PNG.",
+    ],
+    branchEvidence: {
+      baseLabel: "Baseline (example: main)",
+      headLabel: "Feature branch (current work)",
+      beforeSrc: "/screenshots/local-evidence-template/before.svg",
+      afterSrc: "/screenshots/local-evidence-template/after.svg",
+    },
+    images: [],
+    reprompts: [],
   },
 ];
 

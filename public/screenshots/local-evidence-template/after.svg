@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Placeholder after screenshot">
+  <rect width="1200" height="675" fill="#dbeafe"/>
+  <text x="600" y="320" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif" font-size="28" fill="#1e3a8a">
+    Replace with after.png (feature branch)
+  </text>
+  <text x="600" y="370" text-anchor="middle" font-family="ui-monospace,monospace" font-size="16" fill="#3730a3">
+    public/screenshots/local-evidence-template/after.png
+  </text>
+</svg>
