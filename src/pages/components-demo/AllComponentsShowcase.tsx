@@ -315,6 +315,8 @@ export function AllComponentsShowcase() {
   const [slider, setSlider] = React.useState([50]);
   const [comboboxValue, setComboboxValue] = React.useState<string | null>(null);
   const [sectionFilter, setSectionFilter] = React.useState("");
+  /** cmdk scrolls the selected item into view on mount — only mount after the user opens this demo. */
+  const [inlineCommandOpen, setInlineCommandOpen] = React.useState(false);
 
   const filteredSections = React.useMemo(() => {
     const q = sectionFilter.trim().toLowerCase();
@@ -693,7 +695,13 @@ export function AllComponentsShowcase() {
 
           <div className="space-y-2">
             <p className="text-sm font-medium">One-time code</p>
-            <InputOTP maxLength={6} value={otp} onChange={setOtp}>
+            <InputOTP
+              maxLength={6}
+              value={otp}
+              onChange={setOtp}
+              autoComplete="off"
+              name="components-demo-otp"
+            >
               <InputOTPGroup>
                 <InputOTPSlot index={0} />
                 <InputOTPSlot index={1} />
@@ -894,31 +902,42 @@ export function AllComponentsShowcase() {
             </ContextMenu>
           </div>
 
-          <div>
-            <p className="mb-2 text-sm font-medium">Command palette (inline surface)</p>
-            <Command className="max-w-lg border shadow-sm">
-              <CommandInput placeholder="Type a command…" />
-              <CommandList>
-                <CommandEmpty>No results.</CommandEmpty>
-                <CommandGroup heading="Suggestions">
-                  <CommandItem>
-                    <CalendarIcon className="size-4" />
-                    Calendar
-                  </CommandItem>
-                  <CommandItem>
-                    <Activity className="size-4" />
-                    Status
-                  </CommandItem>
-                </CommandGroup>
-                <CommandSeparator />
-                <CommandGroup heading="Files">
-                  <CommandItem>
-                    <FileIcon className="size-4" />
-                    README.md
-                  </CommandItem>
-                </CommandGroup>
-              </CommandList>
-            </Command>
+          <div className="max-w-lg space-y-2">
+            <p className="text-sm font-medium">Command palette (inline surface)</p>
+            <Collapsible open={inlineCommandOpen} onOpenChange={setInlineCommandOpen}>
+              <CollapsibleTrigger asChild>
+                <Button type="button" variant="outline" size="sm">
+                  {inlineCommandOpen ? "Hide" : "Show"} inline command
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-3 data-[state=closed]:hidden">
+                {inlineCommandOpen ? (
+                  <Command className="border shadow-sm">
+                    <CommandInput placeholder="Type a command…" />
+                    <CommandList>
+                      <CommandEmpty>No results.</CommandEmpty>
+                      <CommandGroup heading="Suggestions">
+                        <CommandItem>
+                          <CalendarIcon className="size-4" />
+                          Calendar
+                        </CommandItem>
+                        <CommandItem>
+                          <Activity className="size-4" />
+                          Status
+                        </CommandItem>
+                      </CommandGroup>
+                      <CommandSeparator />
+                      <CommandGroup heading="Files">
+                        <CommandItem>
+                          <FileIcon className="size-4" />
+                          README.md
+                        </CommandItem>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                ) : null}
+              </CollapsibleContent>
+            </Collapsible>
           </div>
 
           <Accordion type="single" collapsible className="w-full max-w-lg border-b">
