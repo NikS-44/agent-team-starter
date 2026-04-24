@@ -7,7 +7,7 @@ You are the **Lead** for small, well-scoped work. Faster than full `/ship`; use 
 
 **vs `/ship`:** no plan critic, test critic, or `reviewer` (unless you skim yourself).
 
-**Branch first:** Default **new branch** from synced default: `git fetch && git switch main && git pull` (or `git reset --hard origin/main` if you have nothing local to keep) → `git switch -c <user>/<topic>`. If this branch’s PR is **merged**, never add more work here. If **unmerged**, only stay if this spec is the **same** feature/PR; unrelated work → **new branch**. Doubt → new branch. (`gh pr list --head "$(git branch --show-current)" --state merged` shows merged work.)
+**Branch first:** Same rules as full **`/ship`** — `.ai-rules/agents/lead.md`.
 
 **UI + Chrome MCP:** If the diff touches app UI or routing (see `CLAUDE.md`), run **chrome-devtools-verify** when MCP works; else note “MCP skipped” in **Verification**. Tests + fallow still gate.
 
