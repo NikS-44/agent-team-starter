@@ -1,5 +1,5 @@
-import { BookOpen, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BookOpen, Sparkles } from "lucide-react";
 
 export function AboutPage() {
   return (
@@ -19,7 +19,10 @@ export function AboutPage() {
           <CardDescription>What ships in the box</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>React 18, Vite, TanStack Query + Router, shadcn/ui (Nova), Tailwind v4, SQLite + Drizzle API.</p>
+          <p>
+            React 18, Vite, TanStack Query + Router, shadcn/ui (Nova), Tailwind v4, SQLite + Drizzle
+            API.
+          </p>
         </CardContent>
       </Card>
       <Card>
@@ -32,8 +35,11 @@ export function AboutPage() {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           <p>
-            Tweak <code className="rounded bg-muted px-1.5 py-0.5 text-xs">src/styles/demo-overrides.css</code> for
-            accents and radii; keep generated theme tokens in one place.
+            Tweak{" "}
+            <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+              src/styles/demo-overrides.css
+            </code>{" "}
+            for accents and radii; keep generated theme tokens in one place.
           </p>
         </CardContent>
       </Card>

@@ -2,15 +2,15 @@
  * Recreates .cursor / .claude symlinks into .ai-rules/ (single source of truth).
  * Idempotent. Run after clone if Git did not check out symlinks (e.g. Windows).
  */
-import fs from "node:fs"
-import path from "node:path"
-import { fileURLToPath } from "node:url"
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const root = path.join(__dirname, "..")
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.join(__dirname, "..");
 
 function warn(message) {
-  process.stderr.write(`${message}\n`)
+  process.stderr.write(`${message}\n`);
 }
 
 /**
@@ -19,16 +19,16 @@ function warn(message) {
  * @returns {"keep" | "replace" | "abort"}
  */
 function existingLinkDisposition(linkAbs, targetAbs) {
-  let stat
+  let stat;
   try {
-    stat = fs.lstatSync(linkAbs)
+    stat = fs.lstatSync(linkAbs);
   } catch {
-    return "abort"
+    return "abort";
   }
   if (stat.isSymbolicLink() && fs.realpathSync(linkAbs) === path.resolve(targetAbs)) {
-    return "keep"
+    return "keep";
   }
-  return "replace"
+  return "replace";
 }
 
 /**
@@ -38,16 +38,16 @@ function existingLinkDisposition(linkAbs, targetAbs) {
  */
 // fallow-ignore-next-line complexity
 function ensureSymlink(targetAbs, linkAbs, type) {
-  const isDir = type === "dir"
+  const isDir = type === "dir";
   if (fs.existsSync(linkAbs)) {
-    const disposition = existingLinkDisposition(linkAbs, targetAbs)
-    if (disposition === "abort" || disposition === "keep") return
-    fs.rmSync(linkAbs, { recursive: true, force: true })
+    const disposition = existingLinkDisposition(linkAbs, targetAbs);
+    if (disposition === "abort" || disposition === "keep") return;
+    fs.rmSync(linkAbs, { recursive: true, force: true });
   } else {
-    fs.mkdirSync(path.dirname(linkAbs), { recursive: true })
+    fs.mkdirSync(path.dirname(linkAbs), { recursive: true });
   }
-  const rel = path.relative(path.dirname(linkAbs), targetAbs)
-  fs.symlinkSync(rel, linkAbs, isDir ? "dir" : "file")
+  const rel = path.relative(path.dirname(linkAbs), targetAbs);
+  fs.symlinkSync(rel, linkAbs, isDir ? "dir" : "file");
 }
 
 const links = [
@@ -59,17 +59,17 @@ const links = [
   [path.join(root, ".ai-rules/commands"), path.join(root, ".claude/commands"), "dir"],
   [path.join(root, ".ai-rules/rules"), path.join(root, ".claude/rules"), "dir"],
   [path.join(root, ".ai-rules/agents"), path.join(root, ".claude/agents"), "dir"],
-]
+];
 
 for (const [target, link, t] of links) {
   if (!fs.existsSync(target)) {
-    warn(`[ai-rules] skip missing target: ${path.relative(root, target)}`)
-    continue
+    warn(`[ai-rules] skip missing target: ${path.relative(root, target)}`);
+    continue;
   }
   try {
-    ensureSymlink(target, link, /** @type {"file"|"dir"} */ (t))
+    ensureSymlink(target, link, /** @type {"file"|"dir"} */ (t));
   } catch (e) {
-    const detail = e instanceof Error ? e.message : String(e)
-    warn(`[ai-rules] could not link ${path.relative(root, link)}: ${detail}`)
+    const detail = e instanceof Error ? e.message : String(e);
+    warn(`[ai-rules] could not link ${path.relative(root, link)}: ${detail}`);
   }
 }

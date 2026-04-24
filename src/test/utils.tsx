@@ -1,8 +1,8 @@
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { type RenderOptions, type RenderResult, render } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { createAppRouter } from "../router";
 
 export function createTestQueryClient(): QueryClient {
