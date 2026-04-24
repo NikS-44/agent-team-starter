@@ -5,6 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import type { ChartConfig } from "@/components/ui/chart";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,6 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, LayoutGrid, MoreHorizontal, TrendingUp } from "lucide-react";
+import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 const kpi = [
@@ -49,9 +57,13 @@ const team = [
   { name: "Asha Chen", role: "Engineering", done: 92 },
   { name: "Marcus I.", role: "Design", done: 78 },
   { name: "Nina P.", role: "Product", done: 65 },
-];
+] as const;
+
+type TeamMember = (typeof team)[number];
 
 export function DashboardDemoPage() {
+  const [detailMember, setDetailMember] = useState<TeamMember | null>(null);
+
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -188,7 +200,19 @@ export function DashboardDemoPage() {
                 </TableHeader>
                 <TableBody>
                   {team.map((m) => (
-                    <TableRow key={m.name}>
+                    <TableRow
+                      key={m.name}
+                      tabIndex={0}
+                      className="cursor-pointer"
+                      aria-label={`View details for ${m.name}`}
+                      onClick={() => setDetailMember(m)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setDetailMember(m);
+                        }
+                      }}
+                    >
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="size-8">
@@ -206,7 +230,7 @@ export function DashboardDemoPage() {
                         <Badge variant="secondary">{m.role}</Badge>
                       </TableCell>
                       <TableCell className="text-right tabular-nums">{m.done}</TableCell>
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
@@ -263,6 +287,25 @@ export function DashboardDemoPage() {
           </Link>
         </span>
       </p>
+
+      <Dialog open={detailMember !== null} onOpenChange={(open) => !open && setDetailMember(null)}>
+        <DialogContent>
+          {detailMember ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>{detailMember.name}</DialogTitle>
+                <DialogDescription>
+                  {detailMember.role} · {detailMember.done} tasks completed (demo data).
+                </DialogDescription>
+              </DialogHeader>
+              <p className="text-sm text-muted-foreground">
+                This modal opens when you select a row in the team table. Hook your own load or edit
+                flow here.
+              </p>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

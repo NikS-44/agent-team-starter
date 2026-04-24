@@ -1,4 +1,5 @@
 import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { useUiStore } from "./store/uiStore";
 import { renderWithRouter } from "./test/utils";
@@ -41,10 +42,16 @@ describe("router", () => {
   });
 
   it("renders DashboardDemoPage at /dashboard-demo", async () => {
+    const user = userEvent.setup();
     renderWithRouter({ initialPath: "/dashboard-demo" });
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: /dashboard demo/i })).toBeInTheDocument()
     );
+    await user.click(screen.getByRole("row", { name: /Asha Chen/i }));
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Asha Chen" })).toBeInTheDocument();
+    });
   });
 
   it("renders ShipReportPage at /ship-report", async () => {
