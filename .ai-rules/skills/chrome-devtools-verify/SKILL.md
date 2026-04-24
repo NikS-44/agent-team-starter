@@ -1,8 +1,9 @@
 ---
 name: chrome-devtools-verify
 description: >-
-  Chrome DevTools MCP: navigate, snapshot, screenshot, console/network. Use for UI
-  sign-off; complements tests. Read MCP tool JSON before calling.
+  Chrome DevTools MCP: navigate, snapshot, screenshot (including before/after on
+  interactive flows), console/network. Use for UI sign-off; complements tests.
+  Read MCP tool JSON before calling.
 ---
 
 # Chrome DevTools MCP (UI verification)
@@ -16,14 +17,15 @@ description: >-
 | Open | `navigate_page` / `list_pages` — full URL + path + hash if needed |
 | Structure | `take_snapshot` — use fresh `uid`s after navigation |
 | Evidence | `take_screenshot` — `filePath` e.g. `verification/<branch>/01-happy.png`; `fullPage: true` for wide pages; element shots use `uid` |
+| Before / after | Whenever the feature **changes** the UI (modal, sheet, sidebar, toggle, filter, submit, error state): **`take_screenshot` before** the interaction, then `click` / `fill` / `type_text` (focus first), `take_snapshot`, then **`take_screenshot` after**. Use paired names, e.g. `02-before-open-dialog.png` → `03-after-open-dialog.png`, same `fullPage` / viewport unless you are doing an element shot (`uid`). |
 | Interact | `click`, `fill`, `type_text` — focus first |
 | Console | `list_console_messages` — at least `error` + `warn` |
 | Network | `list_network_requests` after exercising the feature |
 | **Ship report (this repo)** | **Always** after the feature under test: `navigate_page` to **`/ship-report`** (same origin as Vite, e.g. `http://localhost:5173/ship-report`). `take_snapshot` (and screenshot to `verification/<branch>/…` when useful). In **`list_network_requests`** (include **`fetch`** / **`xhr`**), confirm **`GET /api/ship-verify`** returned **200** and note status in the report. Re-check **console** on that page if the dialog or feature left errors—you want a clean read for ship-report too. |
 
-Cover **happy** path and **error/empty** if relevant; optional narrow viewport (`resize_page`).
+Cover **happy** path and **error/empty** if relevant; optional narrow viewport (`resize_page`). For **error/empty** flows, treat the empty or error surface as the “after” shot (or capture before submit vs after failed submit) so reviewers see the delta.
 
-**Order:** Verify the **changed route or UI** first (snapshots + screenshots + console/network for that flow), then run the **ship-report** step above. Do not skip ship-report for “UI-only” PRs—the page is the app’s **ship smoke** surface and catches broken API wiring unrelated to your diff size.
+**Order:** Verify the **changed route or UI** first (navigate → snapshot → **baseline screenshot** → interact → snapshot → **after screenshot** when applicable → console/network for that flow), then run the **ship-report** step above. Do not skip ship-report for “UI-only” PRs—the page is the app’s **ship smoke** surface and catches broken API wiring unrelated to your diff size.
 
 ## PR images without committing binaries
 
@@ -35,7 +37,7 @@ Cover **happy** path and **error/empty** if relevant; optional narrow viewport (
 1. **Summary** — 1–2 sentences  
 2. **Scope** — paths / routes  
 3. **Verification** — URLs, flows checked (feature route **and** `/ship-report`)  
-4. **Evidence** — screenshot paths in order (include ship-report when you captured one)  
+4. **Evidence** — screenshot paths in order; for interactive flows, list **before** then **after** pairs (and ship-report shots when captured)  
 5. **Console / network** — clean or list issues; **explicitly** note **`GET /api/ship-verify`** status from network  
 6. **Follow-ups** — optional  
 
@@ -43,7 +45,8 @@ Cover **happy** path and **error/empty** if relevant; optional narrow viewport (
 
 **Checklist**
 - [ ] Snapshot after each navigation  
-- [ ] ≥1 screenshot to `filePath` when possible (feature flow; add **`…-ship-report.png`** or similar if you shot ship-report)  
+- [ ] ≥1 screenshot to `filePath` when possible; **if the UI changes with interaction**, paired **before** + **after** screenshots with clear filenames  
+- [ ] Ship-report screenshot (**`…-ship-report.png`** or similar) when you captured it  
 - [ ] Console errors/warns noted (feature page and ship-report)  
 - [ ] Network for features that fetch; **plus** ship-verify **200** on `/ship-report`  
 - [ ] **`/ship-report`** opened and documented in the report (not optional)  
