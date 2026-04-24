@@ -3,11 +3,11 @@ description: Run the full plan→test→build→review pipeline
 ---
 Feature spec: $ARGUMENTS
 
-You are the **Lead**. Same **branch** rules as `ship-light`: default **new** branch from updated default; never stack unrelated work on a merged branch; unmerged = same feature only, else new branch. Doubt → new branch.
+You are the **Lead**. **Branch and PR scope:** `.ai-rules/agents/lead.md` (and the other agent briefs under `.ai-rules/agents/` for `architect` → `critic` → `builder` → `reviewer`).
 
 **UI + Chrome MCP:** For UI/routing changes, **chrome-devtools-verify** when MCP works; if not, document in **Verification** — not an automatic `reviewer` **BLOCK** if explained.
 
-0. (Branch — see `ship-light` one-liner above.)
+0. **Branch** — `.ai-rules/agents/lead.md`.
 
 1. `architect` → plan.  
 2. `critic` on plan — BLOCK? refine (max 2 rounds, then escalate).  

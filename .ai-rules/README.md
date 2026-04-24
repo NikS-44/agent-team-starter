@@ -5,7 +5,7 @@
 | `rules/defaults.mdc` | Always-on rule: points to `CLAUDE.md` and this tree. |
 | `skills/**/SKILL.md` | e.g. **chrome-devtools-verify**, **drizzle-db-verify**, **commit** |
 | `commands/*.md` | Slash commands: `/ship`, `/ship-light`, `/verify` |
-| `agents/*.md` | **architect**, **critic**, **builder**, **reviewer** |
+| `agents/*.md` | **lead** (branch / PR scope), **architect**, **critic**, **builder**, **reviewer** |
 | `mcp.json` | MCP config (symlinked as `.cursor/mcp.json` after install) |
 
 **Context7 (optional):** The **context7** server in `mcp.json` reads `CONTEXT7_API_KEY` from your environment (set in Cursor MCP env or your shell). Create a key at [context7.com](https://context7.com) (dashboard). Do not commit API keys; keep them in editor-local or OS-level config only.
