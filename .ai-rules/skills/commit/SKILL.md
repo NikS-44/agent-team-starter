@@ -28,7 +28,7 @@ description: Create commits, push, open PR. Git-only.
 
 - **Split** last bad commit: `git reset --soft HEAD~1`, unstage, recommit in chunks.
 - **Squash** last N: `git reset --soft HEAD~N` then one new commit.
-- **Fixup rebase:** `git commit --fixup` … `GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash <merge-base>` (details in **address-pr-comments** / team docs).
+- **Fixup rebase:** `git commit --fixup` … `GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash <merge-base>` (details in **fix-comments** / team docs).
 
 ## Avoid
 
