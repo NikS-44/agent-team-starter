@@ -17,6 +17,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "verify": "bash scripts/verify.sh",
     "dev:ready": "bash scripts/dev-ready.sh",
     "dev:stop": "bash scripts/dev-stop.sh",
     "fallow": "fallow",

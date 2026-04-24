@@ -1,5 +1,5 @@
 # Definition of done
-- `pnpm typecheck && pnpm test && pnpm lint && pnpm build` — green
+- `pnpm verify` (or `pnpm typecheck && pnpm test && pnpm lint && pnpm format:check && pnpm build && pnpm fallow:audit`) — green
 - `pnpm fallow audit` — verdict `pass` or `warn` (not `fail`)
 - Tests: happy, error, empty/null, boundaries, loading + error where relevant
 - **UI / routes** (e.g. `src/pages/**`, `src/components/**`, `src/router.ts`, layout, `src/index.css`): when **Chrome DevTools MCP works**, run **chrome-devtools-verify** (console/network, `take_screenshot` + `filePath` under `verification/<branch-or-ticket>/`, `/ship-report` if in scope). For **main vs branch** behavior (e.g. scroll or layout regressions), use **`verify-compare-main`** (`.ai-rules/commands/verify-compare-main.md`) after committing, then describe paired `main-*` / `branch-*` screenshots in the PR. If MCP is down, say so in PR **Verification**; Vitest/build still count — not a hard blocker.
