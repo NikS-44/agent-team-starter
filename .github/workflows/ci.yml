@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            export FALLOW_CHANGED_SINCE="${{ github.event.pull_request.base.sha }}"
+          else
+            BEFORE="${{ github.event.before }}"
+            if [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || [ -z "$BEFORE" ]; then
+              if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+                export FALLOW_CHANGED_SINCE="HEAD~1"
+              else
+                export FALLOW_CI_INITIAL_COMMIT=1
+              fi
+            else
+              export FALLOW_CHANGED_SINCE="$BEFORE"
+            fi
+          fi
+          pnpm verify
