@@ -1,11 +1,11 @@
 ---
-name: address-pr-comments
+name: fix-comments
 description: >-
   Address GitHub PR review: gather unresolved feedback, TODO list, implement selected
   items, thread replies. Needs `gh` (and optionally GitHub MCP).
 ---
 
-# Address PR comments
+# Fix PR comments
 
 **Need:** `gh` installed and `gh auth login`. Prefer GitHub MCP when present; else `gh api` / `gh pr`.
 
