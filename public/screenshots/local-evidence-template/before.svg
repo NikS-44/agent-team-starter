@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Placeholder before screenshot">
+  <rect width="1200" height="675" fill="#e4e4e7"/>
+  <text x="600" y="320" text-anchor="middle" font-family="ui-sans-serif,system-ui,sans-serif" font-size="28" fill="#3f3f46">
+    Replace with before.png (baseline / main)
+  </text>
+  <text x="600" y="370" text-anchor="middle" font-family="ui-monospace,monospace" font-size="16" fill="#71717a">
+    public/screenshots/local-evidence-template/before.png
+  </text>
+</svg>

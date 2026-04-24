@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { DEFAULT_SHIP_REPORT_ID, SHIP_REPORTS } from "@/data/shipReports";
+import type { ShipReportBranchEvidence } from "@/data/shipReportsTypes";
 import { buildClaudeNewChatLink, buildCursorDeeplinks } from "@/lib/shipDeeplinks";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
@@ -58,13 +59,105 @@ const buildGate = [
 const browserGate = [
   "Start dev server and open this page plus any new or changed routes.",
   "list_console_messages — no errors; only expected warnings.",
-  "Happy path: click / fill / type; take_screenshot (save under verification/… with filePath).",
+  "Happy path: click / fill / type; take_screenshot (MCP → verification/…); commit proof under public/screenshots/<slug>/ for ship-report.",
   "Network: no unexpected 4xx/5xx for app API calls.",
   "Error or empty state: one screenshot; console still clean of uncaught errors.",
 ] as const;
 
 function reportById(id: string) {
   return SHIP_REPORTS.find((r) => r.id === id) ?? SHIP_REPORTS[0];
+}
+
+type LightboxState =
+  | { kind: "gallery"; index: number }
+  | { kind: "branch"; src: string; caption: string }
+  | null;
+
+function ShipBranchEvidenceSection({
+  evidence,
+  onOpenBranchImage,
+}: {
+  evidence: ShipReportBranchEvidence;
+  onOpenBranchImage: (src: string, caption: string) => void;
+}) {
+  return (
+    <section
+      className="space-y-4 rounded-2xl border border-border/80 bg-card/30 p-4 sm:p-6"
+      aria-labelledby="branch-evidence-heading"
+      data-testid="ship-branch-evidence"
+    >
+      <h3 id="branch-evidence-heading" className="text-sm font-medium text-foreground">
+        Baseline vs branch (committed screenshots)
+      </h3>
+      <p className="text-sm text-muted-foreground">
+        Full-page captures from the same route: left is{" "}
+        <span className="font-medium text-foreground">{evidence.baseLabel}</span>, right is{" "}
+        <span className="font-medium text-foreground">{evidence.headLabel}</span>. Click an image to
+        zoom. Paths live under <code className="rounded bg-muted px-1 py-0.5 text-xs">public/</code>{" "}
+        so they ship in git and PR diffs.
+      </p>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <figure className="space-y-2">
+          <figcaption className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            {evidence.baseLabel}
+          </figcaption>
+          <button
+            type="button"
+            onClick={() => onOpenBranchImage(evidence.beforeSrc, evidence.baseLabel)}
+            aria-label={`Open full size: ${evidence.baseLabel}`}
+            className={cn(
+              "group w-full overflow-hidden rounded-xl border border-border/80 bg-muted/20 text-left shadow-sm",
+              "transition hover:border-primary/30 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
+            )}
+          >
+            <span className="relative block w-full">
+              <img
+                src={evidence.beforeSrc}
+                alt={`Full-page capture: ${evidence.baseLabel}`}
+                className="max-h-[min(75vh,56rem)] w-full object-contain object-top"
+                loading="lazy"
+                decoding="async"
+              />
+              <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition group-hover:bg-black/20">
+                <span className="flex size-10 items-center justify-center rounded-full bg-background/95 opacity-0 shadow ring-1 ring-border/80 transition group-hover:opacity-100">
+                  <Maximize2 className="size-5 text-foreground" aria-hidden />
+                </span>
+              </span>
+            </span>
+          </button>
+        </figure>
+        <figure className="space-y-2">
+          <figcaption className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            {evidence.headLabel}
+          </figcaption>
+          <button
+            type="button"
+            onClick={() => onOpenBranchImage(evidence.afterSrc, evidence.headLabel)}
+            aria-label={`Open full size: ${evidence.headLabel}`}
+            className={cn(
+              "group w-full overflow-hidden rounded-xl border border-border/80 bg-muted/20 text-left shadow-sm",
+              "transition hover:border-primary/30 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
+            )}
+          >
+            <span className="relative block w-full">
+              <img
+                src={evidence.afterSrc}
+                alt={`Full-page capture: ${evidence.headLabel}`}
+                className="max-h-[min(75vh,56rem)] w-full object-contain object-top"
+                loading="lazy"
+                decoding="async"
+              />
+              <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition group-hover:bg-black/20">
+                <span className="flex size-10 items-center justify-center rounded-full bg-background/95 opacity-0 shadow ring-1 ring-border/80 transition group-hover:opacity-100">
+                  <Maximize2 className="size-5 text-foreground" aria-hidden />
+                </span>
+              </span>
+            </span>
+          </button>
+        </figure>
+      </div>
+    </section>
+  );
 }
 
 function ShipBackendVerifyCard() {
@@ -143,11 +236,27 @@ function ShipBackendVerifyCard() {
 
 export function ShipReportPage() {
   const [reportId, setReportId] = React.useState<string>(DEFAULT_SHIP_REPORT_ID);
-  const [lightboxIndex, setLightboxIndex] = React.useState<number | null>(null);
+  const [lightbox, setLightbox] = React.useState<LightboxState>(null);
 
   const report = reportById(reportId);
-  const openImage = report.images[lightboxIndex ?? -1];
-  const lightboxOpen = lightboxIndex !== null && openImage !== undefined;
+  const openGalleryImage = lightbox?.kind === "gallery" ? report.images[lightbox.index] : undefined;
+  const openBranch =
+    lightbox?.kind === "branch" ? { src: lightbox.src, caption: lightbox.caption } : undefined;
+  const lightboxPayload =
+    openGalleryImage !== undefined
+      ? {
+          src: openGalleryImage.src,
+          alt: openGalleryImage.alt,
+          caption: openGalleryImage.caption,
+        }
+      : openBranch !== undefined
+        ? {
+            src: openBranch.src,
+            alt: openBranch.caption,
+            caption: openBranch.caption,
+          }
+        : null;
+  const lightboxOpen = lightboxPayload !== null;
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-8">
@@ -188,7 +297,7 @@ export function ShipReportPage() {
                 onValueChange={(v) => {
                   if (v) {
                     setReportId(v);
-                    setLightboxIndex(null);
+                    setLightbox(null);
                   }
                 }}
               >
@@ -228,10 +337,10 @@ export function ShipReportPage() {
         <div className="space-y-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
           {report.summary.map((p, i) => (
             <p key={i} className="text-pretty text-foreground/90">
-              {p.split(/(\*\*[^*]+\*\*)/g).map((chunk, i) => {
+              {p.split(/(\*\*[^*]+\*\*)/g).map((chunk, chunkIdx) => {
                 if (chunk.startsWith("**") && chunk.endsWith("**")) {
                   return (
-                    <strong key={i} className="font-medium text-foreground">
+                    <strong key={chunkIdx} className="font-medium text-foreground">
                       {chunk.slice(2, -2)}
                     </strong>
                   );
@@ -242,6 +351,13 @@ export function ShipReportPage() {
           ))}
         </div>
       </section>
+
+      {report.branchEvidence ? (
+        <ShipBranchEvidenceSection
+          evidence={report.branchEvidence}
+          onOpenBranchImage={(src, caption) => setLightbox({ kind: "branch", src, caption })}
+        />
+      ) : null}
 
       {report.images.length > 0 ? (
         <section className="space-y-3" aria-labelledby="screenshot-heading">
@@ -256,7 +372,7 @@ export function ShipReportPage() {
               <li key={img.src}>
                 <button
                   type="button"
-                  onClick={() => setLightboxIndex(i)}
+                  onClick={() => setLightbox({ kind: "gallery", index: i })}
                   aria-label={`Open full size: ${img.caption}`}
                   className={cn(
                     "group w-full overflow-hidden rounded-xl border border-border/80 bg-muted/20 text-left shadow-sm",
@@ -290,7 +406,7 @@ export function ShipReportPage() {
       <Dialog
         open={lightboxOpen}
         onOpenChange={(o) => {
-          if (!o) setLightboxIndex(null);
+          if (!o) setLightbox(null);
         }}
       >
         <DialogContent
@@ -305,13 +421,13 @@ export function ShipReportPage() {
           )}
           onClick={(e) => {
             if ((e.target as HTMLElement | null)?.tagName === "IMG") return;
-            setLightboxIndex(null);
+            setLightbox(null);
           }}
         >
-          {openImage ? (
+          {lightboxPayload ? (
             <>
               <DialogHeader className="sr-only">
-                <DialogTitle>{openImage.caption}</DialogTitle>
+                <DialogTitle>{lightboxPayload.caption}</DialogTitle>
                 <DialogDescription>
                   Full-size screenshot. Use close control or Esc to leave.
                 </DialogDescription>
@@ -329,13 +445,13 @@ export function ShipReportPage() {
               </DialogClose>
               <div className="flex min-h-0 w-full min-w-0 flex-1 items-center justify-center overflow-auto p-0.5">
                 <img
-                  src={openImage.src}
-                  alt={openImage.alt}
+                  src={lightboxPayload.src}
+                  alt={lightboxPayload.alt}
                   className="h-auto max-h-full w-full max-w-full cursor-default object-contain object-center"
                 />
               </div>
               <p className="shrink-0 pt-2 text-center text-sm text-zinc-200 sm:pt-3">
-                {openImage.caption}
+                {lightboxPayload.caption}
               </p>
             </>
           ) : null}
@@ -460,16 +576,22 @@ export function ShipReportPage() {
                 <Separator className="my-4" />
                 <div className="flex flex-wrap items-center gap-3 text-sm">
                   <ImageIcon className="size-4 text-muted-foreground" aria-hidden />
-                  <span className="text-muted-foreground">Artifact folder:</span>
+                  <span className="text-muted-foreground">MCP scratch folder (gitignored):</span>
                   <code className="rounded bg-muted px-2 py-1 text-xs">
                     verification/&lt;branch-or-ticket&gt;/
                   </code>
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Copy proof PNGs into{" "}
-                  <code className="rounded bg-muted px-1 py-0.5">public/ship-reports/…</code> for
-                  this in-app gallery, or add paths in{" "}
-                  <code className="rounded bg-muted px-1">shipReports</code>.
+                  Commit <strong className="font-medium text-foreground">before</strong> /{" "}
+                  <strong className="font-medium text-foreground">after</strong> captures under{" "}
+                  <code className="rounded bg-muted px-1 py-0.5">
+                    public/screenshots/&lt;slug&gt;/
+                  </code>{" "}
+                  and wire <code className="rounded bg-muted px-1">branchEvidence</code> in{" "}
+                  <code className="rounded bg-muted px-1">shipReports.ts</code> (image-only; use the
+                  PR for code diff). Gallery-only shots still use{" "}
+                  <code className="rounded bg-muted px-1">public/ship-reports/…</code> +{" "}
+                  <code className="rounded bg-muted px-1">images[]</code>.
                 </p>
               </CardContent>
             </Card>

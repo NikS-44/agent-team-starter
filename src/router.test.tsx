@@ -66,4 +66,22 @@ describe("router", () => {
       expect(screen.getByTestId("ship-verify-status")).toHaveTextContent(/all checks passed/i)
     );
   });
+
+  it("shows committed branch evidence images when that ship report is selected", async () => {
+    const user = userEvent.setup();
+    renderWithRouter({ initialPath: "/ship-report" });
+    await waitFor(() =>
+      expect(screen.getByTestId("ship-verify-status")).toHaveTextContent(/all checks passed/i)
+    );
+    await user.click(screen.getByRole("button", { name: /select ship report/i }));
+    const option = await screen.findByRole("menuitemradio", {
+      name: /local evidence \(template\)/i,
+    });
+    await user.click(option);
+    await waitFor(() => expect(screen.getByTestId("ship-branch-evidence")).toBeInTheDocument());
+    expect(screen.getByRole("img", { name: /full-page capture: baseline/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: /full-page capture: feature branch/i })
+    ).toBeInTheDocument();
+  });
 });
