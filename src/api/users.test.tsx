@@ -11,9 +11,9 @@ import {
   deleteUser,
   fetchUsers,
   queryKeys,
+  updateUser,
   useCreateUser,
   useUsers,
-  updateUser,
 } from "./users";
 
 function wrapper(queryClient: QueryClient) {
@@ -60,9 +60,7 @@ describe("createUser", () => {
       email: "eve2@example.com",
       role: "member",
     });
-    expect(created.id).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-    );
+    expect(created.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
     expect(created).toMatchObject({
       name: "Eve",
       email: "eve2@example.com",
@@ -163,7 +161,10 @@ describe("useCreateUser", () => {
       role: "admin",
     });
 
-    const list = await queryClient.fetchQuery({ queryKey: queryKeys.users.all(), queryFn: fetchUsers });
+    const list = await queryClient.fetchQuery({
+      queryKey: queryKeys.users.all(),
+      queryFn: fetchUsers,
+    });
     expect(list.some((u) => u.name === "Fay")).toBe(true);
   });
 });

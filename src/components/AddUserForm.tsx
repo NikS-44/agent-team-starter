@@ -29,7 +29,10 @@ export function AddUserForm() {
       <h2 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white">Add user</h2>
       <div className="grid gap-3 sm:grid-cols-2 sm:items-end">
         <div className="sm:col-span-1">
-          <label htmlFor="user-name" className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+          <label
+            htmlFor="user-name"
+            className="mb-1 block text-xs text-gray-600 dark:text-gray-400"
+          >
             Name
           </label>
           <input
@@ -44,7 +47,10 @@ export function AddUserForm() {
           />
         </div>
         <div className="sm:col-span-1">
-          <label htmlFor="user-email" className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+          <label
+            htmlFor="user-email"
+            className="mb-1 block text-xs text-gray-600 dark:text-gray-400"
+          >
             Email
           </label>
           <input
@@ -59,7 +65,10 @@ export function AddUserForm() {
           />
         </div>
         <div>
-          <label htmlFor="user-role" className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+          <label
+            htmlFor="user-role"
+            className="mb-1 block text-xs text-gray-600 dark:text-gray-400"
+          >
             Role
           </label>
           <select

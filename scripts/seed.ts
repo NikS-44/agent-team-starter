@@ -1,9 +1,9 @@
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { createDb } from "../db/client";
-import { seedUsers } from "../db/seed-data";
 import { users } from "../db/schema";
+import { seedUsers } from "../db/seed-data";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
