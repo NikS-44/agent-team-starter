@@ -9,9 +9,34 @@ window.scrollTo = () => {};
 Element.prototype.scrollIntoView = function scrollIntoView() {};
 
 // Charts (Recharts) and resizable panels use ResizeObserver; jsdom does not provide it.
+// Recharts measures the container via ResizeObserver — a no-op observe leaves width/height at 0 and spams stderr.
+// `react-resizable-panels` reads `entry.borderBoxSize[0]` (Resize Observer v2 shape).
 window.ResizeObserver = class ResizeObserver {
-  observe(): void {}
+  constructor(private readonly callback: ResizeObserverCallback) {}
+
+  observe(target: Element): void {
+    const rect = target.getBoundingClientRect();
+    const width = rect.width > 0 ? rect.width : 640;
+    const height = rect.height > 0 ? rect.height : 400;
+    const box: ResizeObserverSize = { inlineSize: width, blockSize: height };
+    queueMicrotask(() => {
+      this.callback(
+        [
+          {
+            target,
+            contentRect: new DOMRect(0, 0, width, height),
+            borderBoxSize: [box],
+            contentBoxSize: [box],
+            devicePixelContentBoxSize: [box],
+          } as ResizeObserverEntry,
+        ],
+        this
+      );
+    });
+  }
+
   unobserve(): void {}
+
   disconnect(): void {}
 };
 

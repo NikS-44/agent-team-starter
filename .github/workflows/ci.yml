@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        id: checkout
         with:
           fetch-depth: 0
 
@@ -27,9 +28,11 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
+        id: install
         run: pnpm install --frozen-lockfile
 
       - name: Verify
+        id: verify
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             export FALLOW_CHANGED_SINCE="${{ github.event.pull_request.base.sha }}"
@@ -46,3 +49,27 @@ jobs:
             fi
           fi
           pnpm verify
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## CI — verify"
+            echo ""
+            echo "High-level run overview for this job (details remain in step logs above)."
+            echo ""
+            echo "| Step | Result |"
+            echo "|------|--------|"
+            echo "| Checkout | ${{ steps.checkout.outcome }} |"
+            echo "| Install (\`pnpm install --frozen-lockfile\`) | ${{ steps.install.outcome }} |"
+            echo "| Verify (\`pnpm verify\`: typecheck, tests, lint, format, build, Fallow) | ${{ steps.verify.outcome }} |"
+            echo ""
+            echo "### Verify pipeline"
+            echo "- **Typecheck:** \`tsgo --noEmit\`"
+            echo "- **Tests:** Vitest (jsdom)"
+            echo "- **Lint:** Oxlint + Biome format check"
+            echo "- **Build:** \`tsgo -b\` + \`vite build\`"
+            echo "- **Fallow:** audit scoped to changed files (PR base or push \`before\` SHA), or full audit locally"
+            echo ""
+            echo "**Event:** \`${{ github.event_name }}\` · **Ref:** \`${{ github.ref }}\` · **SHA:** \`${{ github.sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

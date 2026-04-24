@@ -10,10 +10,10 @@ pnpm build
 
 if [ "${FALLOW_CI_INITIAL_COMMIT:-}" = "1" ]; then
   # First commit on a branch: no parent ref for audit --changed-since (rare; e.g. new repo).
-  pnpm exec fallow dead-code
-  pnpm exec fallow dupes
+  pnpm exec fallow dead-code --quiet
+  pnpm exec fallow dupes --quiet
 elif [ -n "${FALLOW_CHANGED_SINCE:-}" ]; then
-  pnpm exec fallow audit --changed-since "$FALLOW_CHANGED_SINCE"
+  pnpm exec fallow audit --changed-since "$FALLOW_CHANGED_SINCE" --quiet
 else
-  pnpm fallow:audit
+  pnpm exec fallow audit --quiet
 fi
