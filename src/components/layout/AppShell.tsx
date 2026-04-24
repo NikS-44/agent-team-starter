@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
   SidebarContent,
@@ -84,7 +83,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           role="banner"
         >
           <SidebarTrigger className="md:-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
           <div className="ml-auto flex items-center gap-2">
             <Button
               type="button"
