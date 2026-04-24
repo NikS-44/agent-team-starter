@@ -27,6 +27,21 @@ Cover **happy** path and **error/empty** if relevant; optional narrow viewport (
 
 **Order:** Verify the **changed route or UI** first (navigate → snapshot → **baseline screenshot** → interact → snapshot → **after screenshot** when applicable → console/network for that flow), then run the **ship-report** step above. Do not skip ship-report for “UI-only” PRs—the page is the app’s **ship smoke** surface and catches broken API wiring unrelated to your diff size.
 
+## Compare `main` vs feature branch (paired evidence)
+
+Use when reviewers need **baseline vs change** on the same route (scroll jumps, layout, new UI), not only “current branch looks fine.”
+
+**Orchestration:** Cursor command **`verify-compare-main`** (`.ai-rules/commands/verify-compare-main.md`) — **commit** (or stash) first, run quality gates on the feature branch, then **`git checkout main`** → `dev:ready` → Chrome MCP → `dev:stop` → **`git checkout` feature** → repeat with **identical** URL, viewport, and interactions.
+
+**Naming:** Under `verification/<branch-or-ticket>/`, prefix files so pairs are obvious:
+
+- `main-01-<route>-load.png` / `branch-01-<route>-load.png`
+- Same numbering for optional before/after pairs: `main-02-before-…` / `main-03-after-…` and `branch-02-before-…` / `branch-03-after-…`
+
+**Report:** A short table — **Main** column vs **Branch** column — describing behavior each screenshot shows, then list all paths. This is a **human** diff; automated pixel diff is Playwright territory, not this MCP flow.
+
+**Caveats:** Lockfile or env differences between `main` and the branch can skew the UI; run `pnpm install` when refs diverge. Always return to the feature branch and `dev:stop` when finished.
+
 ## PR images without committing binaries
 
 - Prefer `scripts/pr-comment-verify-gist.sh <PR#> *.png` from repo root (`gh auth` required). `gh gist create` often rejects binaries — the script or **browser** gist upload + raw URL workarounds; commit SHA + `?raw=true` blob URLs are another option (see script comments / older ship docs).
