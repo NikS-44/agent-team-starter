@@ -78,11 +78,11 @@
       "@typescript/native-preview",
       "better-sqlite3",
       "esbuild",
+      "fallow",
       "msw",
       "oxlint",
       "oxlint-tsgolint"
-    ],
-    "ignoredBuiltDependencies": ["fallow"]
+    ]
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

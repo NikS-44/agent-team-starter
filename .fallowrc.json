@@ -9,6 +9,24 @@
     "@fontsource-variable/geist",
     "tw-animate-css"
   ],
+  "ignoreExports": [
+    {
+      "file": "src/components/ui/sidebar.tsx",
+      "exports": ["*"]
+    },
+    {
+      "file": "src/components/ui/chart.tsx",
+      "exports": ["*"]
+    },
+    {
+      "file": "src/components/ui/calendar.tsx",
+      "exports": ["*"]
+    },
+    {
+      "file": "src/components/ui/carousel.tsx",
+      "exports": ["*"]
+    }
+  ],
   "rules": {
     "unused-files": "error",
     "unused-exports": "warn",
@@ -19,6 +37,7 @@
   },
   "health": {
     "maxCyclomatic": 15,
-    "maxCognitive": 12
+    "maxCognitive": 12,
+    "maxCrap": 40
   }
 }
