@@ -1,6 +1,11 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
-  "entry": ["src/test/setup.ts", "server/index.ts", "scripts/seed.ts"],
+  "entry": [
+    "src/test/setup.ts",
+    "src/test/localStorage-polyfill.ts",
+    "server/index.ts",
+    "scripts/seed.ts"
+  ],
   "ignorePatterns": ["dist/**", "public/mockServiceWorker.js", ".claude/**"],
   "ignoreDependencies": [
     "date-fns",
