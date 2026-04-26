@@ -12,11 +12,12 @@ concurrency:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-# Issue #31: PR comments + check annotations; still optional vs hard verify gate
+# Issue #31: PR comments + Check run with output.annotations (Files tab on diff) + still optional vs verify gate
 permissions:
   contents: read
   issues: write
   pull-requests: read
+  checks: write
 
 jobs:
   verify:
@@ -60,13 +61,14 @@ jobs:
           pnpm verify
 
       # See scripts/patch-coverage/publishPr.ts: optional PATCH_COVERAGE_MIN_PCT to fail the step (default: informational)
-      - name: Patch coverage (PR diff, issue #31)
+      - name: Patch coverage (PR diff + check run on head SHA, issue #31)
         if: always() && github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           LCOV_PATH: coverage/lcov.info
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          # `checks: write` is required to create a [Check run](https://docs.github.com/en/rest/checks/runs) with `output.annotations` (diff on Files). Set POST_PATCH_COVERAGE_CHECK=0 to skip.
         run: pnpm exec tsx scripts/patch-coverage/runPatchCoverageCli.ts
 
       - name: Coverage summary

@@ -11,6 +11,7 @@ import {
 import { formatPatchCoverageComment } from "./formatComment";
 import { parseGitDiffAdditions } from "./parseGitDiff";
 import { parseLcov } from "./parseLcov";
+import { buildCheckRunOutput, postPatchCoverageCheckRun } from "./patchCheckRun";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,15 +49,6 @@ function getOptionalMinPct(): number | null {
   return n;
 }
 
-function emitPatchWarningLines(uncovered: PatchCoverageResult["uncovered"]): void {
-  for (const { file, line } of uncovered) {
-    const rel = file.split("\\").join("/");
-    process.stdout.write(
-      `::warning file=${rel},line=${String(line)}::Instrumented line has 0 hits in patch coverage (add or extend a test)\n`
-    );
-  }
-}
-
 async function postCommentIfPossible(
   fullBody: string,
   prNumber: number,
@@ -85,8 +77,57 @@ async function postCommentIfPossible(
   }
 }
 
+function shouldPostCheckRun(): boolean {
+  return (process.env.POST_PATCH_COVERAGE_CHECK?.trim() ?? "1") === "1";
+}
+
+function readCheckName(): string {
+  return (process.env.PATCH_COVERAGE_CHECK_NAME?.trim() ?? "Patch coverage").slice(0, 100);
+}
+
+async function postCheckRunIfPossible(p: {
+  result: PatchCoverageResult;
+  bodyMarkdown: string;
+  headSha: string;
+  runUrl: string;
+  minGateFailed: boolean;
+}): Promise<void> {
+  if (!shouldPostCheckRun()) {
+    return;
+  }
+  const token = process.env.GITHUB_TOKEN;
+  const repoFull = process.env.GITHUB_REPOSITORY;
+  if (!token || !repoFull) {
+    return;
+  }
+  const [owner, repo] = repoFull.split("/");
+  if (!owner || !repo) {
+    return;
+  }
+  const payload = buildCheckRunOutput(p.result.uncovered);
+  const conclusion = p.minGateFailed ? "failure" : "success";
+  try {
+    await postPatchCoverageCheckRun({
+      owner,
+      repo,
+      token,
+      headSha: p.headSha,
+      checkName: readCheckName(),
+      detailsUrl: p.runUrl,
+      summary: p.bodyMarkdown,
+      conclusion,
+      payload,
+    });
+  } catch (err) {
+    stderr(
+      `patch-coverage: could not post check run to the diff: ${err instanceof Error ? err.message : String(err)} (non-fatal; e.g. fork PR or missing checks: write)`
+    );
+  }
+}
+
 /**
- * Emits `::warning::` workflow annotations and writes comment markdown.
+ * Writes the PR comment, posts a [GitHub Check run](https://docs.github.com/en/rest/checks/runs) with
+ * `output.annotations` (shows on the PR **Files** tab for `head_sha` when `checks: write` is allowed).
  * Exits 1 only when `PATCH_COVERAGE_MIN_PCT` is set and patch % is below it.
  */
 export async function runPatchCoveragePublish(options: {
@@ -126,8 +167,6 @@ export async function runPatchCoveragePublish(options: {
   const additions = parseGitDiffAdditions(diffText, () => true);
   const result = computePatchCoverage(lcov, additions, isClientCoverageSourceFile);
 
-  emitPatchWarningLines(result.uncovered);
-
   const body = formatPatchCoverageComment(result, {
     baseSha: options.baseSha,
     headSha: options.headSha,
@@ -141,12 +180,21 @@ export async function runPatchCoveragePublish(options: {
 
   await postCommentIfPossible(fullBody, options.prNumber, options.shouldPostComment);
 
-  if (minPct != null) {
-    const p = patchCoveragePercent(result);
-    if (p != null && p < minPct) {
-      stderr(`patch-coverage: ${p.toFixed(1)}% is below PATCH_COVERAGE_MIN_PCT=${String(minPct)}`);
-      return { exitCode: 1, body: fullBody };
-    }
+  const pct = patchCoveragePercent(result);
+  const minGateFailed = minPct != null && pct != null && minPct > pct;
+  await postCheckRunIfPossible({
+    result,
+    bodyMarkdown: body,
+    headSha: options.headSha,
+    runUrl: options.runUrl,
+    minGateFailed,
+  });
+
+  if (minGateFailed) {
+    stderr(
+      `patch-coverage: ${(pct ?? 0).toFixed(1)}% is below PATCH_COVERAGE_MIN_PCT=${String(minPct)}`
+    );
+    return { exitCode: 1, body: fullBody };
   }
 
   return { exitCode: 0, body: fullBody };
