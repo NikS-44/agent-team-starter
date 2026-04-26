@@ -22,6 +22,7 @@
     "dev:stop": "bash scripts/dev-stop.sh",
     "fallow": "fallow",
     "fallow:audit": "fallow audit",
+    "fallow:audit:precommit": "bash scripts/fallow-precommit.sh",
     "fallow:dead": "fallow dead-code",
     "fallow:health": "fallow health",
     "db:generate": "drizzle-kit generate",

@@ -7,6 +7,11 @@
     "scripts/seed.ts"
   ],
   "ignorePatterns": ["dist/**", "public/mockServiceWorker.js", ".claude/**"],
+  "duplicates": {
+    "ignoreImports": true,
+    "minLines": 8,
+    "minTokens": 70
+  },
   "ignoreDependencies": [
     "date-fns",
     "next-themes",
