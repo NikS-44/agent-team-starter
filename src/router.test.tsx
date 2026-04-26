@@ -59,6 +59,7 @@ describe("router", () => {
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: /ship report/i })).toBeInTheDocument()
     );
+    expect(screen.getByRole("heading", { name: /local verification/i })).toBeInTheDocument();
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: /backend & database/i })).toBeInTheDocument()
     );

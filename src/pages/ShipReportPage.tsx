@@ -26,6 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { LOCAL_VERIFICATION_REPORTS } from "@/data/localVerificationReports";
+import type { LocalVerificationReport } from "@/data/localVerificationReports";
 import { DEFAULT_SHIP_REPORT_ID, SHIP_REPORTS } from "@/data/shipReports";
 import type { ShipReportBranchEvidence } from "@/data/shipReportsTypes";
 import { buildClaudeNewChatLink, buildCursorDeeplinks } from "@/lib/shipDeeplinks";
@@ -234,6 +236,101 @@ function ShipBackendVerifyCard() {
   );
 }
 
+function LocalVerificationReportCard({ report }: { report: LocalVerificationReport }) {
+  return (
+    <Card className="border-border/80">
+      <CardHeader>
+        <CardTitle className="text-base">{report.title}</CardTitle>
+        <CardDescription>
+          <code className="text-xs">verification/{report.id}/</code>
+          {report.summary ? ` — ${report.summary}` : null}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {report.images.length > 0 ? (
+          <ul className="grid list-none grid-cols-1 gap-3 sm:grid-cols-2">
+            {report.images.map((image) => (
+              <li key={image.path}>
+                <figure className="overflow-hidden rounded-xl border border-border/80 bg-muted/20">
+                  <img
+                    src={image.src}
+                    alt={image.caption}
+                    className="aspect-[16/10] w-full object-cover object-top"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <figcaption className="space-y-1 p-2.5">
+                    <span className="block text-xs font-medium text-foreground">
+                      {image.caption}
+                    </span>
+                    <code className="block break-all text-[0.7rem] text-muted-foreground">
+                      {image.path}
+                    </code>
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {report.artifacts.length > 0 ? (
+          <ul className="space-y-2 text-sm">
+            {report.artifacts.map((artifact) => (
+              <li
+                key={artifact.path}
+                className="rounded-lg border border-border/70 bg-muted/20 p-3"
+              >
+                <div className="font-medium text-foreground">{artifact.name}</div>
+                <code className="break-all text-xs text-muted-foreground">{artifact.path}</code>
+                {artifact.preview ? (
+                  <pre className="mt-2 max-h-24 overflow-auto rounded bg-background/80 p-2 text-xs">
+                    {artifact.preview}
+                  </pre>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+function LocalVerificationSection() {
+  return (
+    <section className="space-y-4" aria-labelledby="local-verification-heading">
+      <div className="space-y-2">
+        <h2 id="local-verification-heading" className="text-lg font-semibold tracking-tight">
+          Local verification
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Screenshots and notes are discovered from{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">verification/&lt;slug&gt;/</code>{" "}
+          at dev/build time, so ignored local evidence can be reviewed in-app without committing
+          PNGs. Add an optional{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">report.json</code> with{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">title</code> and{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">summary</code> to label a run.
+        </p>
+      </div>
+      {LOCAL_VERIFICATION_REPORTS.length > 0 ? (
+        <div className="space-y-4" data-testid="local-verification-reports">
+          {LOCAL_VERIFICATION_REPORTS.map((localReport) => (
+            <LocalVerificationReportCard key={localReport.id} report={localReport} />
+          ))}
+        </div>
+      ) : (
+        <Card className="border-dashed">
+          <CardContent className="pt-6 text-sm text-muted-foreground">
+            No local verification artifacts found. Capture screenshots under{" "}
+            <code className="rounded bg-muted px-1 py-0.5 text-xs">verification/&lt;slug&gt;/</code>{" "}
+            and reload this page to surface them here.
+          </CardContent>
+        </Card>
+      )}
+    </section>
+  );
+}
+
 export function ShipReportPage() {
   const [reportId, setReportId] = React.useState<string>(DEFAULT_SHIP_REPORT_ID);
   const [lightbox, setLightbox] = React.useState<LightboxState>(null);
@@ -313,6 +410,8 @@ export function ShipReportPage() {
       </div>
 
       <ShipBackendVerifyCard />
+
+      <LocalVerificationSection />
 
       <section
         className="space-y-4 rounded-2xl border border-border/80 bg-card/30 p-4 sm:p-6"
