@@ -7,6 +7,11 @@ import { Hono } from "hono";
 import { createDb } from "../db/client";
 import { users } from "../db/schema";
 import { seedUsers } from "../db/seed-data";
+import {
+  handleDeleteAuthSession,
+  handleGetAuthSession,
+  handlePostAuthSession,
+} from "./authSession";
 import { getShipVerifyResponse } from "./shipVerify";
 import { existingUserForIdParam } from "./userLookup";
 import { handlePatchUser, handlePostUser } from "./userMutations";
@@ -31,6 +36,12 @@ app.get("/api/ship-verify", (c) => {
     return c.json({ error: "Ship verify failed" }, 500);
   }
 });
+
+app.get("/api/auth", (c) => handleGetAuthSession(c, db));
+
+app.post("/api/auth", (c) => handlePostAuthSession(c, db));
+
+app.delete("/api/auth", () => handleDeleteAuthSession(db));
 
 app.get("/api/users", (c) => {
   const rows = db.select().from(users).all();

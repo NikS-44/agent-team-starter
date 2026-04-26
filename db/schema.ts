@@ -7,4 +7,11 @@ export const users = sqliteTable("users", {
   role: text("role", { enum: ["admin", "member"] }).notNull(),
 });
 
+export const authSession = sqliteTable("auth_session", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+});
+
 export type UserRow = typeof users.$inferSelect;
+export type AuthSessionRow = typeof authSession.$inferSelect;

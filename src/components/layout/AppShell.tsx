@@ -1,3 +1,4 @@
+import { useAuthSession, useLogout } from "@/api/auth";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -21,6 +22,7 @@ import {
   Info,
   LayoutDashboard,
   LayoutGrid,
+  LogIn,
   Moon,
   PanelsTopLeft,
   Sun,
@@ -31,12 +33,53 @@ import * as React from "react";
 const mainNav: { to: string; label: string; icon: React.ComponentType<{ className?: string }> }[] =
   [
     { to: "/users", label: "Users", icon: Users },
+    { to: "/login", label: "Login", icon: LogIn },
     { to: "/playground", label: "Playground", icon: LayoutGrid },
     { to: "/components-demo", label: "Components", icon: PanelsTopLeft },
     { to: "/dashboard-demo", label: "Dashboard", icon: LayoutDashboard },
     { to: "/ship-report", label: "Ship report", icon: ClipboardList },
     { to: "/about", label: "About", icon: Info },
   ];
+
+function AuthControls() {
+  const { data: session, isPending, isError } = useAuthSession();
+  const logoutMutation = useLogout();
+
+  if (isPending) {
+    return <span className="text-xs text-muted-foreground">Loading auth...</span>;
+  }
+
+  if (isError) {
+    return <span className="text-xs text-destructive">Sign-in unavailable</span>;
+  }
+
+  if (!session) {
+    return (
+      <Button asChild variant="outline" size="sm">
+        <Link to="/login">Sign in</Link>
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="hidden text-sm text-muted-foreground sm:inline">
+        Current user: {session.name}
+      </span>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          void logoutMutation.mutateAsync();
+        }}
+        disabled={logoutMutation.isPending}
+      >
+        {logoutMutation.isPending ? "Signing out..." : "Sign out"}
+      </Button>
+    </div>
+  );
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -84,6 +127,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         >
           <SidebarTrigger className="md:-ml-1" />
           <div className="ml-auto flex items-center gap-2">
+            <AuthControls />
             <Button
               type="button"
               variant="outline"

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "./queryKeys";
 import { type ShipVerifyResponse, ShipVerifyResponseSchema } from "./shipVerify.schemas";
-import { queryKeys } from "./users";
 
 export async function fetchShipVerify(): Promise<ShipVerifyResponse> {
   const res = await fetch("/api/ship-verify");

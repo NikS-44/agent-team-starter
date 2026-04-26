@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { afterAll, afterEach, beforeAll } from "vitest";
-import { resetUserHandlersState } from "../mocks/handlers";
+import { resetAuthHandlersState, resetUserHandlersState } from "../mocks/handlers";
 import { server } from "../mocks/server";
 
 // jsdom does not implement window.scrollTo — stub it to suppress "not implemented" noise
@@ -76,6 +76,7 @@ Object.defineProperty(window, "matchMedia", {
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterEach(() => {
+  resetAuthHandlersState();
   resetUserHandlersState();
   server.resetHandlers();
 });

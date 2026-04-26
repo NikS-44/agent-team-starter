@@ -33,6 +33,14 @@ describe("router", () => {
     );
   });
 
+  it("renders LoginPage at /login", async () => {
+    renderWithRouter({ initialPath: "/login" });
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: /sign in/i })).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /login/i })).toHaveAttribute("aria-current", "page");
+    });
+  });
+
   it("renders ComponentsDemoPage at /components-demo", async () => {
     renderWithRouter({ initialPath: "/components-demo" });
     await waitFor(() =>
