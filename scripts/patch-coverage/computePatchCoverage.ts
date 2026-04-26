@@ -4,21 +4,57 @@ import type { LcovLineHits } from "./parseLcov";
 type UncoveredLine = { file: string; line: number };
 
 export type PatchCoverageResult = {
-  /** In-scope (client coverage) changed lines */
+  /**
+   * In-scope diff lines that V8 **instrumented** (present in lcov `DA` for the file).
+   * Comments, blanks, and other non-executable lines are **excluded** so they
+   * do not dilute the rate or trigger check spam.
+   */
   total: number;
-  /** Subset of total with hit count > 0 in lcov */
+  /** Subset of total with at least one hit in lcov */
   covered: number;
-  /** Uncovered: hit === 0 or not reported for that line in lcov (not executed) */
+  /** Instrumented diff lines with 0 runs (candidates for more tests) */
   uncovered: UncoveredLine[];
   perFile: { file: string; total: number; covered: number }[];
 };
 
-function lineIsCovered(lcov: Map<string, LcovLineHits>, file: string, line: number): boolean {
+type DiffLineKind = "skip" | "covered" | "miss";
+
+/**
+ * A diff line with no lcov `DA` row is not counted (comments, blanks, some imports, etc.).
+ */
+function kindForDiffLine(
+  lcov: Map<string, LcovLineHits>,
+  file: string,
+  line: number
+): DiffLineKind {
   const rec = lcov.get(file);
-  if (!rec) {
-    return false;
+  if (!rec?.da.has(line)) {
+    return "skip";
   }
-  return (rec.da.get(line) ?? 0) > 0;
+  return (rec.da.get(line) ?? 0) > 0 ? "covered" : "miss";
+}
+
+function tallyOneFile(
+  file: string,
+  lineList: number[],
+  lcov: Map<string, LcovLineHits>
+): { inst: number; hit: number; missed: UncoveredLine[] } {
+  let inst = 0;
+  let hit = 0;
+  const missed: UncoveredLine[] = [];
+  for (const line of lineList) {
+    const k = kindForDiffLine(lcov, file, line);
+    if (k === "skip") {
+      continue;
+    }
+    inst += 1;
+    if (k === "covered") {
+      hit += 1;
+    } else {
+      missed.push({ file, line });
+    }
+  }
+  return { inst, hit, missed };
 }
 
 /**
@@ -39,20 +75,12 @@ export function computePatchCoverage(
     if (!filterPath(file)) {
       continue;
     }
-    let ft = 0;
-    let fc = 0;
-    for (const line of lineList) {
-      total += 1;
-      ft += 1;
-      if (lineIsCovered(lcov, file, line)) {
-        covered += 1;
-        fc += 1;
-      } else {
-        uncovered.push({ file, line });
-      }
-    }
-    if (ft > 0) {
-      perFile.push({ file, total: ft, covered: fc });
+    const { inst, hit, missed } = tallyOneFile(file, lineList, lcov);
+    total += inst;
+    covered += hit;
+    uncovered.push(...missed);
+    if (inst > 0) {
+      perFile.push({ file, total: inst, covered: hit });
     }
   }
   perFile.sort((a, b) => a.file.localeCompare(b.file));
