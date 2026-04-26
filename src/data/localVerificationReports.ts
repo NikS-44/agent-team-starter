@@ -4,14 +4,14 @@ type VerificationAssetInput = {
   text?: string;
 };
 
-export type LocalVerificationImage = {
+type LocalVerificationImage = {
   name: string;
   caption: string;
   src: string;
   path: string;
 };
 
-export type LocalVerificationArtifact = {
+type LocalVerificationArtifact = {
   name: string;
   path: string;
   preview: string;
