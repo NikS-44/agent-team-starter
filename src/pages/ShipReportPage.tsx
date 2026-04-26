@@ -296,6 +296,13 @@ function LocalVerificationReportCard({ report }: { report: LocalVerificationRepo
 }
 
 function LocalVerificationSection() {
+  const [selectedReportId, setSelectedReportId] = React.useState(
+    LOCAL_VERIFICATION_REPORTS[0]?.id ?? ""
+  );
+  const selectedReport =
+    LOCAL_VERIFICATION_REPORTS.find((localReport) => localReport.id === selectedReportId) ??
+    LOCAL_VERIFICATION_REPORTS[0];
+
   return (
     <section className="space-y-4" aria-labelledby="local-verification-heading">
       <div className="space-y-2">
@@ -312,11 +319,49 @@ function LocalVerificationSection() {
           <code className="rounded bg-muted px-1 py-0.5 text-xs">summary</code> to label a run.
         </p>
       </div>
-      {LOCAL_VERIFICATION_REPORTS.length > 0 ? (
+      {selectedReport ? (
         <div className="space-y-4" data-testid="local-verification-reports">
-          {LOCAL_VERIFICATION_REPORTS.map((localReport) => (
-            <LocalVerificationReportCard key={localReport.id} report={localReport} />
-          ))}
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Verification folder
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-10 w-full min-w-0 justify-between gap-2 sm:w-[min(100%,22rem)]"
+                  aria-label="Select local verification folder"
+                >
+                  <span className="truncate">{selectedReport.title}</span>
+                  <ChevronDown className="size-4 shrink-0 opacity-70" aria-hidden />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[min(100vw-2rem,24rem)]">
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                  Local verification folders
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup
+                  value={selectedReport.id}
+                  onValueChange={(value) => {
+                    if (value) setSelectedReportId(value);
+                  }}
+                >
+                  {LOCAL_VERIFICATION_REPORTS.map((localReport) => (
+                    <DropdownMenuRadioItem
+                      key={localReport.id}
+                      value={localReport.id}
+                      className="text-start"
+                    >
+                      {localReport.title}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <LocalVerificationReportCard report={selectedReport} />
         </div>
       ) : (
         <Card className="border-dashed">
