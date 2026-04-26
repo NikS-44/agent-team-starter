@@ -77,7 +77,7 @@ jobs:
               "",
             ].join("\n");
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
-            NODE
+          NODE
           fi
 
       - name: Upload coverage

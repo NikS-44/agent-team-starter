@@ -26,7 +26,11 @@ health_json=$(mktemp)
 changed_json=$(mktemp)
 trap 'rm -f "$health_json" "$changed_json"' EXIT
 
-printf '%s\n' "${changed_paths[@]}" > "$changed_json"
+if [[ ${#changed_paths[@]} -gt 0 ]]; then
+  printf '%s\n' "${changed_paths[@]}" > "$changed_json"
+else
+  : > "$changed_json"
+fi
 pnpm exec fallow health --format json --quiet > "$health_json" || true
 node --input-type=module - "$health_json" "$changed_json" <<'NODE'
 import fs from "node:fs";
