@@ -33,7 +33,7 @@
     "prepare": "husky",
     "postinstall": "node scripts/ensure-ai-rules-symlinks.mjs",
     "ai-rules:link": "node scripts/ensure-ai-rules-symlinks.mjs",
-    "precommit": "lint-staged && pnpm run fallow:audit"
+    "precommit": "pnpm exec lint-staged --no-stash && pnpm run fallow:audit:precommit"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mts,cts,json,jsonc,css}": "biome check --write",

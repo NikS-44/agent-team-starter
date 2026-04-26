@@ -1,3 +1,2 @@
 bash scripts/precommit-merged-pr-guard.sh
-pnpm exec lint-staged --no-stash
-pnpm run fallow:audit:precommit
+pnpm run precommit
