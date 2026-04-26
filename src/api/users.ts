@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "./queryKeys";
 import {
   type CreateUserBody,
   CreateUserBodySchema,
@@ -13,15 +14,7 @@ export type { CreateUserBody, UpdateUserBody, User } from "./users.schemas";
 
 // fallow-ignore-next-line unused-export
 export { CreateUserBodySchema, UpdateUserBodySchema, UserSchema } from "./users.schemas";
-
-export const queryKeys = {
-  users: {
-    all: () => ["users"] as const,
-  },
-  shipVerify: {
-    all: () => ["ship-verify"] as const,
-  },
-} as const;
+export { queryKeys } from "./queryKeys";
 
 function messageFromErrorResponse(res: Response, errText: string): string {
   let message = errText || `HTTP ${res.status}`;

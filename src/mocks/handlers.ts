@@ -4,6 +4,7 @@ import type { ShipVerifyResponse } from "../api/shipVerify.schemas";
 import type { User } from "../api/users.schemas";
 
 let userList: User[] = seedUsers.map((u) => ({ ...u }));
+let authSession: { name: string; email: string } | null = null;
 
 export const userFixtures = seedUsers;
 
@@ -11,7 +12,12 @@ function resetList() {
   userList = seedUsers.map((u) => ({ ...u }));
 }
 
+function resetAuth() {
+  authSession = null;
+}
+
 export { resetList as resetUserHandlersState };
+export { resetAuth as resetAuthHandlersState };
 
 function parseMockUserBody(body: { name?: string; email?: string; role?: string }):
   | { ok: true; name: string; email: string; role: "admin" | "member" }
@@ -43,6 +49,25 @@ export const handlers = [
       },
     };
     return HttpResponse.json(body);
+  }),
+
+  http.get("/api/auth", () => HttpResponse.json(authSession)),
+
+  http.post("/api/auth", async ({ request }) => {
+    const body = (await request.json()) as { name?: string; email?: string };
+    if (!body.name?.trim() || !body.email?.includes("@")) {
+      return HttpResponse.json(
+        { error: "Validation failed", fieldErrors: { name: ["Name is required"] } },
+        { status: 400 }
+      );
+    }
+    authSession = { name: body.name.trim(), email: body.email };
+    return HttpResponse.json(authSession);
+  }),
+
+  http.delete("/api/auth", () => {
+    authSession = null;
+    return new HttpResponse(null, { status: 204 });
   }),
 
   http.get("/api/users", () => HttpResponse.json(userList)),

@@ -9,6 +9,7 @@ import { App } from "./App";
 import { AboutPage } from "./pages/AboutPage";
 import { ComponentsDemoPage } from "./pages/ComponentsDemoPage";
 import { DashboardDemoPage } from "./pages/DashboardDemoPage";
+import { LoginPage } from "./pages/LoginPage";
 import { PlaygroundPage } from "./pages/PlaygroundPage";
 import { ShipReportPage } from "./pages/ShipReportPage";
 import { UsersPage } from "./pages/UsersPage";
@@ -35,6 +36,12 @@ const playgroundRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/playground",
   component: PlaygroundPage,
+});
+
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  component: LoginPage,
 });
 
 const aboutRoute = createRoute({
@@ -64,6 +71,7 @@ const shipReportRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   usersRoute,
+  loginRoute,
   playgroundRoute,
   componentsDemoRoute,
   dashboardDemoRoute,
