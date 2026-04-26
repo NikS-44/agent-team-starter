@@ -21,12 +21,13 @@ export type LocalVerificationReport = {
   id: string;
   title: string;
   summary?: string;
+  createdAt?: string;
   images: LocalVerificationImage[];
   artifacts: LocalVerificationArtifact[];
 };
 
 type MutableReport = LocalVerificationReport & {
-  sortKey: string;
+  sortTime: number;
 };
 
 function titleFromSlug(value: string) {
@@ -60,8 +61,9 @@ function verificationParts(path: string) {
 
 function reportFromMetadata(text: string) {
   try {
-    const parsed = JSON.parse(text) as { title?: unknown; summary?: unknown };
+    const parsed = JSON.parse(text) as { createdAt?: unknown; summary?: unknown; title?: unknown };
     return {
+      createdAt: typeof parsed.createdAt === "string" ? parsed.createdAt : undefined,
       title: typeof parsed.title === "string" ? parsed.title : undefined,
       summary: typeof parsed.summary === "string" ? parsed.summary : undefined,
     };
@@ -76,7 +78,7 @@ function getOrCreateReport(reports: Map<string, MutableReport>, slug: string) {
 
   const report: MutableReport = {
     id: slug,
-    sortKey: slug,
+    sortTime: Number.NEGATIVE_INFINITY,
     title: titleFromSlug(slug),
     images: [],
     artifacts: [],
@@ -89,6 +91,11 @@ function applyMetadata(report: MutableReport, text: string) {
   const metadata = reportFromMetadata(text);
   report.title = metadata.title ?? report.title;
   report.summary = metadata.summary ?? report.summary;
+  report.createdAt = metadata.createdAt ?? report.createdAt;
+  if (metadata.createdAt) {
+    const parsedTime = Date.parse(metadata.createdAt);
+    report.sortTime = Number.isNaN(parsedTime) ? report.sortTime : parsedTime;
+  }
 }
 
 function addAssetToReport(
@@ -120,7 +127,10 @@ function addAssetToReport(
   }
 }
 
-function finalizeReport({ sortKey: _sortKey, ...report }: MutableReport): LocalVerificationReport {
+function finalizeReport({
+  sortTime: _sortTime,
+  ...report
+}: MutableReport): LocalVerificationReport {
   return {
     ...report,
     images: report.images.sort((a, b) => a.name.localeCompare(b.name)),
@@ -140,7 +150,9 @@ export function buildLocalVerificationReports(
     addAssetToReport(getOrCreateReport(reports, parts.slug), asset, parts);
   }
 
-  return [...reports.values()].map(finalizeReport).sort((a, b) => a.id.localeCompare(b.id));
+  return [...reports.values()]
+    .sort((a, b) => b.sortTime - a.sortTime || a.id.localeCompare(b.id))
+    .map(finalizeReport);
 }
 
 const imageModules = import.meta.glob("../../verification/**/*.{png,jpg,jpeg,webp}", {

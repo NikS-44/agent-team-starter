@@ -237,6 +237,10 @@ function ShipBackendVerifyCard() {
 }
 
 function LocalVerificationReportCard({ report }: { report: LocalVerificationReport }) {
+  const createdDate = report.createdAt ? new Date(report.createdAt) : null;
+  const createdLabel =
+    createdDate && !Number.isNaN(createdDate.getTime()) ? createdDate.toLocaleString() : undefined;
+
   return (
     <Card className="border-border/80">
       <CardHeader>
@@ -244,6 +248,12 @@ function LocalVerificationReportCard({ report }: { report: LocalVerificationRepo
         <CardDescription>
           <code className="text-xs">verification/{report.id}/</code>
           {report.summary ? ` — ${report.summary}` : null}
+          {createdLabel ? (
+            <>
+              {" "}
+              <span className="text-muted-foreground">Created {createdLabel}</span>
+            </>
+          ) : null}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -316,7 +326,9 @@ function LocalVerificationSection() {
           PNGs. Add an optional{" "}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">report.json</code> with{" "}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">title</code> and{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">summary</code> to label a run.
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">summary</code> and{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">createdAt</code> to label and sort
+          a run. Timestamped reports load newest first.
         </p>
       </div>
       {selectedReport ? (

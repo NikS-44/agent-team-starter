@@ -41,6 +41,7 @@ describe("buildLocalVerificationReports", () => {
         text: JSON.stringify({
           title: "Auth flow verification",
           summary: "Validated the local auth happy path and logout.",
+          createdAt: "2026-04-26T05:15:00.000Z",
         }),
       },
       {
@@ -54,7 +55,27 @@ describe("buildLocalVerificationReports", () => {
         id: "auth-flow",
         title: "Auth flow verification",
         summary: "Validated the local auth happy path and logout.",
+        createdAt: "2026-04-26T05:15:00.000Z",
       }),
     ]);
+  });
+
+  it("sorts timestamped verification folders newest first", () => {
+    const reports = buildLocalVerificationReports([
+      {
+        path: "../../verification/older/report.json",
+        text: JSON.stringify({ title: "Older run", createdAt: "2026-04-26T04:00:00.000Z" }),
+      },
+      {
+        path: "../../verification/newer/report.json",
+        text: JSON.stringify({ title: "Newer run", createdAt: "2026-04-26T05:00:00.000Z" }),
+      },
+      {
+        path: "../../verification/untimed/ship-report.png",
+        url: "/assets/ship-report.png",
+      },
+    ]);
+
+    expect(reports.map((report) => report.id)).toEqual(["newer", "older", "untimed"]);
   });
 });
