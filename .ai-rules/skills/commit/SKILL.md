@@ -5,6 +5,7 @@ description: Create commits, push, open PR. Git-only.
 
 ## Safety (read first)
 
+- **Merged PR / branch:** Do not add commits on a branch whose PR is already merged. The pre-commit hook (`scripts/precommit-merged-pr-guard.sh`) blocks that (via `gh` when available). Create a new branch from `main`: `git fetch origin && git switch -c <user>/<topic> origin/main`. One-off bypass: `SKIP_MERGED_BRANCH_GUARD=1 git commit` (avoid for normal work).
 - No `--no-verify` — fix hooks.
 - No interactive `git rebase -i` except `GIT_SEQUENCE_EDITOR=true … --autosquash` when automated.
 - No fake ticket IDs. HEREDOC for commit bodies. `git status -s` after each step.
@@ -18,7 +19,7 @@ description: Create commits, push, open PR. Git-only.
 ## Flow
 
 1. `git status -s` · `git diff --stat` · `git log -10` — understand WIP. Compare to merge-base if a long branch.
-2. If `main` and new work, branch `git switch -c <user>/<area>-<slug>` (infer prefix from `git branch` names with `/`).
+2. If on `main` with new work, or you need a fresh line of work (including after a merged PR), branch: `git switch -c <user>/<area>-<slug>` (infer prefix from `git branch` names with `/`). If the current branch’s PR is merged, switch off it first (see Safety).
 3. **Group** into commits (list plan: title, why, files per commit; ask if unclear).
 4. `git add` / `git add -p` → `git commit` with heredoc message.
 5. After all commits: `git log --oneline`, spot-check `git show --name-only` per commit.
