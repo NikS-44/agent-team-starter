@@ -53,6 +53,41 @@ jobs:
           fi
           pnpm verify
 
+      - name: Coverage summary
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            node <<'NODE'
+            const fs = require("node:fs");
+            const p = "coverage/coverage-summary.json";
+            const j = JSON.parse(fs.readFileSync(p, "utf8"));
+            const t = j.total;
+            const row = (name, o) => `| ${name} | ${o.pct}% | ${o.covered}/${o.total} |`;
+            const md = [
+              "## Test coverage (Vitest)",
+              "",
+              "Scope and gates: `vite.config.ts` `test.coverage` (client `src/`, excluding shadcn `components/ui` and components-demo).",
+              "",
+              "| Metric | Pct | Covered / Total |",
+              "|--------|-----|-----------------|",
+              row("Lines", t.lines),
+              row("Statements", t.statements),
+              row("Functions", t.functions),
+              row("Branches", t.branches),
+              "",
+            ].join("\n");
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
+            NODE
+          fi
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+          if-no-files-found: ignore
+
       - name: Job summary
         if: always()
         run: |
@@ -69,7 +104,7 @@ jobs:
             echo ""
             echo "### Verify pipeline"
             echo "- **Typecheck:** \`tsgo --noEmit\`"
-            echo "- **Tests:** Vitest (jsdom)"
+            echo "- **Tests:** Vitest (jsdom) with coverage thresholds (see \`test.coverage\` in \`vite.config.ts\`)"
             echo "- **Lint:** Oxlint + Biome format check"
             echo "- **Build:** \`tsgo -b\` + \`vite build\`"
             echo "- **Fallow:** audit scoped to changed files (PR base or push \`before\` SHA), or full audit locally"
