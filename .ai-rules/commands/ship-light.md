@@ -7,6 +7,8 @@ You are the **Lead** for small, well-scoped work. Faster than full `/ship`; use 
 
 **vs `/ship`:** no plan critic, test critic, or `reviewer` (unless you skim yourself).
 
+**vs `/ship-interactive`:** this flow stays fast; for mandatory pauses to confirm risky decisions, use **`/ship-interactive`**.
+
 **Branch first:** Same rules as full **`/ship`** — `.ai-rules/agents/lead.md`.
 
 **UI + Chrome MCP:** If the diff touches app UI or routing (see `CLAUDE.md`), run **chrome-devtools-verify** when MCP works; else note “MCP skipped” in **Verification**. Tests + fallow still gate.
@@ -15,7 +17,7 @@ You are the **Lead** for small, well-scoped work. Faster than full `/ship`; use 
 
 **Pipeline**
 1. **Plan** — Short bullets: goal, files, risks. `architect` only if spec is fuzzy. No plan critic.
-2. **Build** — One `builder` pass: implement, tests, `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, UI per `agents/builder.md` Phase 3 (fallow + DevTools if MCP up).
+2. **Build** — One `builder` pass: implement, tests, `pnpm typecheck && pnpm lint && pnpm test:coverage && pnpm build` (or `pnpm verify` when in doubt), UI per `agents/builder.md` Phase 3 (fallow + DevTools if MCP up).
 3. **Lead fix** — At most one follow-up to `builder` if not green.
 4. **Fallow** — `fallow_audit` or `pnpm fallow audit --format json`. `fail` → fix once or hand off to full `/ship`.
 5. **Verification (UI/routes + MCP)** — Optional spot-check: screenshots, console/network, `/ship-report` if relevant. PR body always has a **Verification** section. No MCP → say so; green tests can still ship.

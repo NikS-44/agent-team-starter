@@ -59,5 +59,35 @@ export default defineConfig({
     setupFiles: ["src/test/localStorage-polyfill.ts", "src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     css: false,
+    coverage: {
+      provider: "v8",
+      /**
+       * Vitest runs in jsdom; gate covers client app source only. Server/db/scripts
+       * are validated via their own tests or drizzle-db-verify, not this suite.
+       * Excludes shadcn `components/ui` and the components-demo page (huge, rarely exercised in unit tests).
+       */
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "**/*.d.ts",
+        "**/*.{test,spec}.{ts,tsx}",
+        "src/main.tsx",
+        "src/mocks/**",
+        "src/test/**",
+        "src/**/components/ui/**",
+        "src/pages/components-demo/**",
+        /** Type-only modules (no runtime statements). */
+        "src/**/*Types.ts",
+      ],
+      reportsDirectory: "coverage",
+      reporter: ["text", "json-summary", "lcov"],
+      reportOnFailure: true,
+      thresholds: {
+        lines: 90,
+        statements: 90,
+        /** Function and branch % stay slightly lower; line coverage is the primary 90% gate. */
+        functions: 83,
+        branches: 76,
+      },
+    },
   },
 });

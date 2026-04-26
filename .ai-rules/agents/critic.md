@@ -21,6 +21,7 @@ When reviewing TESTS, check:
 - Loading/pending states asserted, not skipped
 - Zod parse failures tested with malformed fixtures
 - Query invalidation behavior tested (mutation → expected refetch)
+- **Coverage of new or changed code paths** — for meaningful behavioral changes, new branches (errors, early returns) should be exercised, not only the happy path; if tests skip obvious error/empty paths that also drive line coverage, BLOCK
 - No test relies on real network — MSW or equivalent mocks in place
 - Cleanup: query client reset between tests, no state leaks
 

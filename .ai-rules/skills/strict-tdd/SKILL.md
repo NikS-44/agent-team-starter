@@ -39,3 +39,5 @@ Report:
 - the implementation path,
 - final targeted test command,
 - broader verification command if run.
+
+After the behavior is in place, run **`pnpm test:coverage`** (or **`pnpm verify`**) and ensure the change stays within the **client coverage gate** in `vite.config.ts` (`test.coverage`). If a metric is below the **aspirational 100%** line target, add tests until the gate is green; only document a **waiver** in the PR **Coverage** section with a reason and follow-up, per `CLAUDE.md`.

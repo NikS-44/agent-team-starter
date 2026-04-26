@@ -16,3 +16,5 @@ React + Zustand + TanStack Query + Zod. **TDD:** failing tests from plan → gre
 - **Both** 3b and 3c if both apply.
 
 **Hard:** Don’t “fix” tests by weakening them (escalate). No server data in Zustand. No inline `queryKey`. ≤5 fix attempts per test then escalate. DevTools/DB: document skips.
+
+**Coverage:** before calling work done, run **`pnpm test:coverage`** or **`pnpm verify`**; the client Vitest gate in `vite.config.ts` must pass. If a feature cannot meet the gate, escalate — do not land without a documented PR **Coverage** waiver, per `CLAUDE.md`.

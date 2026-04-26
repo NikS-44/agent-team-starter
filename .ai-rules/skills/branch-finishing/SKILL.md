@@ -14,7 +14,7 @@ This skill is for branch-level readiness. For git safety, commit grouping, push,
 3. **Diff skim** — review the full branch diff against the base branch, not only the latest commit.
 4. **Checks** — run the narrow checks for touched areas, then broader gates when risk warrants:
    - code/docs only: `pnpm format:check` and Fallow audit as applicable,
-   - shared app code: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`,
+   - shared app code: `pnpm typecheck && pnpm lint && pnpm test:coverage && pnpm build` (or `pnpm verify`); capture coverage % for the PR,
    - DB/API/schema: `drizzle-db-verify`,
    - UI/routes: `chrome-devtools-verify` when MCP works.
 5. **Fallow** — run Fallow MCP audit or `pnpm fallow audit`; fix `fail`, report `warn`.
@@ -28,6 +28,11 @@ This skill is for branch-level readiness. For git safety, commit grouping, push,
 ```markdown
 ## Summary
 - What changed and why
+
+## Coverage
+- Meets `vite.config.ts` gate: yes/no
+- Lines / statements / functions / branches % (from local `pnpm test:coverage` or CI job summary)
+- If below 100% aspirational or gate waived: reason + follow-up
 
 ## Verification
 - Commands run

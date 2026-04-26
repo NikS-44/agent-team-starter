@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 pnpm typecheck
-pnpm test
+pnpm test:coverage
 pnpm lint
 pnpm format:check
 pnpm build

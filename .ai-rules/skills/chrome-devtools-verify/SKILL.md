@@ -67,4 +67,4 @@ Use when reviewers need **baseline vs change** on the same route (scroll jumps, 
 - [ ] **`/ship-report`** opened and documented in the report (not optional)  
 - [ ] Report lists file paths  
 
-**With stack:** New routes → **tanstack-routes** skill. **DB-only** change → **drizzle-db-verify**, not a browser block. This skill does **not** replace `pnpm test` / `pnpm typecheck`.
+**With stack:** New routes → **route** skill (`route/SKILL.md`). **DB-only** change → **drizzle-db-verify**, not a browser block. This skill does **not** replace `pnpm test` / `pnpm typecheck`.
