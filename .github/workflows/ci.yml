@@ -12,6 +12,12 @@ concurrency:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+# Issue #31: PR comments + check annotations; still optional vs hard verify gate
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -52,6 +58,16 @@ jobs:
             fi
           fi
           pnpm verify
+
+      # See scripts/patch-coverage/publishPr.ts: optional PATCH_COVERAGE_MIN_PCT to fail the step (default: informational)
+      - name: Patch coverage (PR diff, issue #31)
+        if: always() && github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          LCOV_PATH: coverage/lcov.info
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: pnpm exec tsx scripts/patch-coverage/runPatchCoverageCli.ts
 
       - name: Coverage summary
         if: always()

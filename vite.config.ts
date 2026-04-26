@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
+import { VITEST_COVERAGE_EXCLUDE, VITEST_COVERAGE_INCLUDE } from "./src/coverage/coverageScope";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -57,7 +58,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["src/test/localStorage-polyfill.ts", "src/test/setup.ts"],
-    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    include: ["src/**/*.{test,spec}.{ts,tsx}", "scripts/patch-coverage/*.test.ts"],
     css: false,
     coverage: {
       provider: "v8",
@@ -65,19 +66,10 @@ export default defineConfig({
        * Vitest runs in jsdom; gate covers client app source only. Server/db/scripts
        * are validated via their own tests or drizzle-db-verify, not this suite.
        * Excludes shadcn `components/ui` and the components-demo page (huge, rarely exercised in unit tests).
+       * Globs: `src/coverage/coverageScope.ts` (shared with patch-coverage reports).
        */
-      include: ["src/**/*.{ts,tsx}"],
-      exclude: [
-        "**/*.d.ts",
-        "**/*.{test,spec}.{ts,tsx}",
-        "src/main.tsx",
-        "src/mocks/**",
-        "src/test/**",
-        "src/**/components/ui/**",
-        "src/pages/components-demo/**",
-        /** Type-only modules (no runtime statements). */
-        "src/**/*Types.ts",
-      ],
+      include: [...VITEST_COVERAGE_INCLUDE],
+      exclude: [...VITEST_COVERAGE_EXCLUDE],
       reportsDirectory: "coverage",
       reporter: ["text", "json-summary", "lcov"],
       reportOnFailure: true,
