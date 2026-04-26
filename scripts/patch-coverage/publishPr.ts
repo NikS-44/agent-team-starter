@@ -52,7 +52,7 @@ function emitPatchWarningLines(uncovered: PatchCoverageResult["uncovered"]): voi
   for (const { file, line } of uncovered) {
     const rel = file.split("\\").join("/");
     process.stdout.write(
-      `::warning file=${rel},line=${String(line)}::In-scope diff line not covered by tests (patch report)\n`
+      `::warning file=${rel},line=${String(line)}::Instrumented line has 0 hits in patch coverage (add or extend a test)\n`
     );
   }
 }

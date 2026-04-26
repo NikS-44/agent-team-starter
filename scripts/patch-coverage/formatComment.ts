@@ -13,8 +13,8 @@ export function formatPatchCoverageComment(
   const pct = patchCoveragePercent(result);
   const headline =
     pct == null
-      ? "**No client-coverage files** in the diff (per `src/coverage/coverageScope.ts`); patch rate not applicable."
-      : `**Patch hit rate (changed in-scope lines):** ${pct.toFixed(1)}% **(${result.covered} / ${result.total}** covered).`;
+      ? "**No instrumented, in-scope diff lines** in this PR (per `src/coverage/coverageScope.ts` and lcov `DA` lines); patch rate not applicable."
+      : `**Patch hit rate (instrumented diff lines only):** ${pct.toFixed(1)}% **(${result.covered} / ${result.total}** covered). Non-executable lines (comments, blanks, etc.) are excluded.`;
 
   const minLine =
     meta.minPct != null
@@ -23,8 +23,8 @@ export function formatPatchCoverageComment(
 
   const tableRows: string[] = [
     "",
-    "| File | Changed lines in scope | Covered |",
-    "|------|------------------------|---------|",
+    "| File | Instrumented diff lines | Covered |",
+    "|------|-------------------------|---------|",
   ];
   if (result.perFile.length === 0) {
     tableRows.push("| — | — | — |");

@@ -19,7 +19,7 @@ description: >-
 1. After behavior changes, run **`pnpm test:coverage`** or full **`pnpm verify`** before claiming done.
 2. If coverage fails, add or extend tests; do not weaken the gate in config without human approval and a **PR Coverage** waiver.
 3. In PRs, paste or link **lines / statements / functions / branches** (from the command output or CI **Test coverage (Vitest)** job summary). If any metric is below 100% or the gate, document **why** and **follow-up** in **Coverage** (see `CLAUDE.md` and `.github/pull_request_template.md`).
-4. On **same-repo pull requests**, CI also posts/updates a **Patch coverage (issue #31)** comment (in-scope **diff** hit rate) and may emit check annotations for uncovered changed lines. **Merge** still requires the global `pnpm verify` / Vitest gate; the patch line is **informational** unless a maintainer later sets `PATCH_COVERAGE_MIN_PCT` in the workflow. Fork PRs may not get the comment (token limits).
+4. On **same-repo pull requests**, CI also posts/updates a **Patch coverage (issue #31)** comment: hit rate of **V8-instrumented** diff lines (lcov `DA` entries only; comments, blanks, and other non-executable lines are **not** counted or annotated). `::warning` check annotations are only for those lines with 0 hits. This is **not** a Codecov-style colored gutter on the file diff; GitHub’s native check UI cannot paint green/yellow/red per line like a dedicated coverage app—**green** is effectively *no* annotation, **warning** = missed covered line. **Merge** still requires the global `pnpm verify` / Vitest gate; the patch line is **informational** unless a maintainer later sets `PATCH_COVERAGE_MIN_PCT` in the workflow. Fork PRs may not get the comment (token limits).
 
 ## What this does not cover
 
