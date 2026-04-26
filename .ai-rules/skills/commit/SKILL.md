@@ -23,7 +23,8 @@ description: Create commits, push, open PR. Git-only.
 3. **Group** into commits (list plan: title, why, files per commit; ask if unclear).
 4. `git add` / `git add -p` → `git commit` with heredoc message.
 5. After all commits: `git log --oneline`, spot-check `git show --name-only` per commit.
-6. **Push:** `git ls-remote --heads origin <branch>` empty → `git push -u origin <branch>`. Else `git fetch origin <branch>` then force-with-lease as needed. **PR:** `gh pr view` or `gh pr create` with `## Summary` + `## Test plan`.
+6. **Push before calling the commit done:** `git ls-remote --heads origin <branch>` empty → `git push -u origin <branch>`. Else `git fetch origin <branch>` then push or force-with-lease as needed. `git status -s` after push.
+7. **PR:** If requested or part of the workflow, `gh pr view` or `gh pr create` with `## Summary` + `## Test plan`.
 
 ## Common
 
