@@ -8,8 +8,7 @@ import {
 } from "./auth.schemas";
 import { queryKeys } from "./queryKeys";
 
-export type { AuthSession, LoginBody } from "./auth.schemas";
-export { AuthSessionSchema, LoginBodySchema, queryKeys };
+export { queryKeys };
 
 function messageFromErrorResponse(res: Response, errText: string): string {
   let message = errText || `HTTP ${res.status}`;
