@@ -1,9 +1,9 @@
 ---
-name: tanstack-routes
-description: Add/change TanStack Router routes; keep `AppShell` nav in sync.
+name: route
+description: /route — Add/change TanStack Router routes; keep `AppShell` nav in sync.
 ---
 
-# Routes + shell
+# /route
 
 | Task | File |
 |------|------|
