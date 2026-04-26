@@ -4,7 +4,8 @@
     "src/test/setup.ts",
     "src/test/localStorage-polyfill.ts",
     "server/index.ts",
-    "scripts/seed.ts"
+    "scripts/seed.ts",
+    "scripts/patch-coverage/runPatchCoverageCli.ts"
   ],
   "ignorePatterns": ["dist/**", "public/mockServiceWorker.js", ".claude/**"],
   "duplicates": {
