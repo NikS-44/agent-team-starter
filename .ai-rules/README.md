@@ -3,7 +3,7 @@
 | Path | Use |
 |------|-----|
 | `rules/defaults.mdc` | Always-on rule: points to `CLAUDE.md` and this tree. |
-| `skills/**/SKILL.md` | e.g. **chrome-devtools-verify**, **drizzle-db-verify**, **commit** |
+| `skills/**/SKILL.md` | e.g. **project-api**, **tech-debt**, **architecture-adr**, **design-doc**, **strict-tdd**, **systematic-debugging**, **improve-codebase**, **grill-me**, **branch-finishing**, **chrome-devtools-verify**, **drizzle-db-verify**, **commit** |
 | `commands/*.md` | Slash commands: `/ship`, `/ship-light`, `/verify` |
 | `agents/*.md` | **lead** (branch / PR scope), **architect**, **critic**, **builder**, **reviewer** |
 | `mcp.json` | MCP config (symlinked as `.cursor/mcp.json` after install) |
