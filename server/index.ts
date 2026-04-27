@@ -1,12 +1,12 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { serve } from "@hono/node-server";
-import { count, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { Hono } from "hono";
 import { createDb } from "../db/client";
-import { users } from "../db/schema";
-import { seedUsers } from "../db/seed-data";
+import { paymentMethods, users } from "../db/schema";
+import { ensureDemoSeed } from "./ensureDemoSeed";
 import { getShipVerifyResponse } from "./shipVerify";
 import { existingUserForIdParam } from "./userLookup";
 import { handlePatchUser, handlePostUser } from "./userMutations";
@@ -16,11 +16,7 @@ const migrationsFolder = path.join(__dirname, "../drizzle");
 
 const db = createDb();
 migrate(db, { migrationsFolder });
-
-const countRow = db.select({ c: count() }).from(users).get();
-if ((countRow?.c ?? 0) === 0) {
-  db.insert(users).values(seedUsers).run();
-}
+ensureDemoSeed(db);
 
 const app = new Hono();
 
@@ -34,6 +30,17 @@ app.get("/api/ship-verify", (c) => {
 
 app.get("/api/users", (c) => {
   const rows = db.select().from(users).all();
+  return c.json(rows);
+});
+
+app.get("/api/users/:userId/payment-methods", (c) => {
+  const resolved = existingUserForIdParam(c, db, c.req.param("userId"));
+  if ("response" in resolved) return resolved.response;
+  const rows = db
+    .select()
+    .from(paymentMethods)
+    .where(eq(paymentMethods.userId, resolved.user.id))
+    .all();
   return c.json(rows);
 });
 

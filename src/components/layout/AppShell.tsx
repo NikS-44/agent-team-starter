@@ -13,11 +13,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { DEMO_ALICE_USER_ID } from "@/demo/constants";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/uiStore";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   ClipboardList,
+  CreditCard,
   Info,
   LayoutDashboard,
   LayoutGrid,
@@ -28,15 +30,25 @@ import {
 } from "lucide-react";
 import * as React from "react";
 
-const mainNav: { to: string; label: string; icon: React.ComponentType<{ className?: string }> }[] =
-  [
-    { to: "/users", label: "Users", icon: Users },
-    { to: "/playground", label: "Playground", icon: LayoutGrid },
-    { to: "/components-demo", label: "Components", icon: PanelsTopLeft },
-    { to: "/dashboard-demo", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/ship-report", label: "Ship report", icon: ClipboardList },
-    { to: "/about", label: "About", icon: Info },
-  ];
+const mainNav: {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  params?: Record<string, string>;
+}[] = [
+  { to: "/users", label: "Users", icon: Users },
+  {
+    to: "/users/$userId/payment-methods",
+    label: "OTU cards",
+    icon: CreditCard,
+    params: { userId: DEMO_ALICE_USER_ID },
+  },
+  { to: "/playground", label: "Playground", icon: LayoutGrid },
+  { to: "/components-demo", label: "Components", icon: PanelsTopLeft },
+  { to: "/dashboard-demo", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/ship-report", label: "Ship report", icon: ClipboardList },
+  { to: "/about", label: "About", icon: Info },
+];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -57,14 +69,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <SidebarMenu>
                 {mainNav.map((item) => {
                   const Icon = item.icon;
+                  const isPaymentMethods = item.to.includes("payment-methods");
                   const isActive =
                     item.to === "/"
                       ? pathname === "/"
-                      : pathname === item.to || pathname.startsWith(`${item.to}/`);
+                      : isPaymentMethods
+                        ? pathname.includes("/payment-methods")
+                        : pathname === item.to || pathname.startsWith(`${item.to}/`);
                   return (
-                    <SidebarMenuItem key={item.to}>
+                    <SidebarMenuItem key={`${item.to}-${item.label}`}>
                       <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
-                        <Link to={item.to} aria-current={isActive ? "page" : undefined}>
+                        <Link
+                          to={item.to}
+                          params={item.params}
+                          aria-current={isActive ? "page" : undefined}
+                        >
                           <Icon className="size-4" />
                           <span>{item.label}</span>
                         </Link>

@@ -8,6 +8,27 @@
       "when": 1776909207827,
       "tag": "0000_faithful_lilith",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1777255064663,
+      "tag": "0001_payment_methods",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1777255200000,
+      "tag": "0002_rebuild_payment_methods_card_number",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1777255300000,
+      "tag": "0003_payment_methods_cvv",
+      "breakpoints": true
     }
   ]
 }

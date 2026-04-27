@@ -1,6 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
+import { DEMO_ALICE_USER_ID } from "./demo/constants";
 import { useUiStore } from "./store/uiStore";
 import { renderWithRouter } from "./test/utils";
 
@@ -12,6 +13,21 @@ describe("router", () => {
   it("renders UsersPage at /users", async () => {
     renderWithRouter({ initialPath: "/users" });
     await waitFor(() => expect(screen.getByText("Alice Admin")).toBeInTheDocument());
+  });
+
+  it("renders OTU payment methods for a user", async () => {
+    const user = userEvent.setup();
+    renderWithRouter({
+      initialPath: `/users/${DEMO_ALICE_USER_ID}/payment-methods`,
+    });
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: /one-time use cards/i })).toBeInTheDocument()
+    );
+    expect(screen.getAllByText("•••• •••• •••• ••••").length).toBeGreaterThan(0);
+    await user.click(screen.getAllByRole("button", { name: /^show$/i })[0]);
+    await waitFor(() =>
+      expect(screen.getAllByText("4242 4242 4242 4242").length).toBeGreaterThan(0)
+    );
   });
 
   it("redirects / to /users", async () => {
