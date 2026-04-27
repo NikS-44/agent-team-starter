@@ -73,6 +73,15 @@ describe("createUser", () => {
       createUser({ name: "X", email: "alice@example.com", role: "member" })
     ).rejects.toThrow(/already exists/i);
   });
+
+  it("propagates non-JSON error bodies as the error message", async () => {
+    server.use(
+      http.post("/api/users", () => new HttpResponse("upstream failure", { status: 502 }))
+    );
+    await expect(
+      createUser({ name: "X", email: "new@example.com", role: "member" })
+    ).rejects.toThrow(/upstream failure/);
+  });
 });
 
 describe("updateUser", () => {
@@ -113,6 +122,11 @@ describe("deleteUser", () => {
     await expect(deleteUser(victim!.id)).resolves.toBeUndefined();
     const after = await fetchUsers();
     expect(after.some((u) => u.id === victim!.id)).toBe(false);
+  });
+
+  it("throws when the server returns a non-204 error", async () => {
+    server.use(http.delete("/api/users/:id", () => new HttpResponse("no", { status: 500 })));
+    await expect(deleteUser("00000000-0000-4000-8000-000000000001")).rejects.toThrow(/no/);
   });
 });
 

@@ -4,6 +4,7 @@ import {
   type DragEndEvent,
   KeyboardSensor,
   PointerSensor,
+  type UniqueIdentifier,
   closestCenter,
   useSensor,
   useSensors,
@@ -18,6 +19,19 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 import * as React from "react";
+
+/** Pure reorder used by `SortableListDemo` — unit-tested without DnD simulation. */
+export function reorderSortableDemoItems<T extends { id: string }>(
+  prev: T[],
+  event: { active: { id: UniqueIdentifier }; over: { id: UniqueIdentifier } | null }
+): T[] {
+  const { active, over } = event;
+  if (!over || active.id === over.id) return prev;
+  const oldIndex = prev.findIndex((i) => i.id === active.id);
+  const newIndex = prev.findIndex((i) => i.id === over.id);
+  if (oldIndex < 0 || newIndex < 0) return prev;
+  return arrayMove(prev, oldIndex, newIndex);
+}
 
 const defaultItems = [
   { id: "1", label: "Plan the feature" },
@@ -67,14 +81,7 @@ export function SortableListDemo() {
   );
 
   const onDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    setItems((prev) => {
-      const oldIndex = prev.findIndex((i) => i.id === active.id);
-      const newIndex = prev.findIndex((i) => i.id === over.id);
-      if (oldIndex < 0 || newIndex < 0) return prev;
-      return arrayMove(prev, oldIndex, newIndex);
-    });
+    setItems((prev) => reorderSortableDemoItems(prev, event));
   };
 
   return (

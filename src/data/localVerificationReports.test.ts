@@ -78,4 +78,12 @@ describe("buildLocalVerificationReports", () => {
 
     expect(reports.map((report) => report.id)).toEqual(["newer", "older", "untimed"]);
   });
+
+  it("falls back gracefully when report.json is not valid JSON", () => {
+    const reports = buildLocalVerificationReports([
+      { path: "../../verification/bad-json/report.json", text: "{ not json" },
+    ]);
+    expect(reports).toHaveLength(1);
+    expect(reports[0]).toMatchObject({ id: "bad-json", title: "Bad Json" });
+  });
 });
