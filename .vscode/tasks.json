@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": [],
+      "label": "npm: dev",
+      "detail": "concurrently -k -n api,vite -c blue,magenta \"pnpm run dev:api\" \"vite\""
+    },
+    {
+      "type": "npm",
+      "script": "install",
+      "group": "clean",
+      "problemMatcher": [],
+      "label": "npm: install",
+      "detail": "install dependencies from package"
+    },
+    {
+      "type": "npm",
+      "script": "verify",
+      "problemMatcher": [],
+      "label": "npm: verify",
+      "detail": "bash scripts/verify.sh"
+    }
+  ]
+}
