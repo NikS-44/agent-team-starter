@@ -96,7 +96,9 @@ export function ShipReportImageLightbox({
         overlayClassName="cursor-pointer bg-black/75 supports-backdrop-filter:backdrop-blur-sm"
         showCloseButton={false}
         className={cn(
-          "!flex h-[min(100dvh-1.5rem,100vh-1.5rem)] w-[min(100vw-1.5rem,100%)] !max-w-[min(100vw-1.5rem,100%)]",
+          "!flex h-[min(100dvh-1.5rem,100vh-1.5rem)] w-[min(100vw-1.5rem,100%)]",
+          // DialogContent defaults include sm:max-w-sm; override on sm+ so the image can use the viewport.
+          "!max-w-[min(100vw-1.5rem,100%)] sm:!max-w-[min(100vw-1.5rem,100%)]",
           "min-h-0 flex-col gap-0 overflow-hidden border-0 bg-zinc-950/40 p-3 shadow-none ring-0 sm:p-4 md:p-5",
           "cursor-pointer"
         )}
@@ -162,11 +164,11 @@ export function ShipReportImageLightbox({
                 </Button>
               </>
             ) : null}
-            <div className="flex min-h-0 w-full min-w-0 flex-1 items-center justify-center overflow-auto p-0.5">
+            <div className="flex min-h-0 w-full min-w-0 flex-1 items-center justify-center overflow-hidden p-0.5">
               <img
                 src={lightboxSlide.src}
                 alt={lightboxSlide.alt}
-                className="h-auto max-h-full w-full max-w-full cursor-default object-contain object-center"
+                className="h-full w-full min-h-0 min-w-0 cursor-default object-contain object-center"
               />
             </div>
             <p className="shrink-0 pt-2 text-center text-sm text-zinc-200 sm:pt-3">
