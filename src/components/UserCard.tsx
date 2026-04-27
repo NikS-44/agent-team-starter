@@ -5,22 +5,17 @@ interface UserCardProps {
   user: User;
 }
 
-export function UserCard({ user }: UserCardProps) {
-  const [editing, setEditing] = useState(false);
+function UserCardEditForm({ user, onClose }: { user: User; onClose: () => void }) {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [role, setRole] = useState<"admin" | "member">(user.role);
-
   const updateUser = useUpdateUser();
-  const deleteUser = useDeleteUser();
 
   useEffect(() => {
-    if (!editing) {
-      setName(user.name);
-      setEmail(user.email);
-      setRole(user.role);
-    }
-  }, [user, editing]);
+    setName(user.name);
+    setEmail(user.email);
+    setRole(user.role);
+  }, [user]);
 
   async function onSave(e: FormEvent) {
     e.preventDefault();
@@ -30,11 +25,106 @@ export function UserCard({ user }: UserCardProps) {
         id: user.id,
         body: { name, email, role },
       });
-      setEditing(false);
+      onClose();
     } catch {
       // error shown via updateUser.error
     }
   }
+
+  function onCancel() {
+    updateUser.reset();
+    setName(user.name);
+    setEmail(user.email);
+    setRole(user.role);
+    onClose();
+  }
+
+  return (
+    <form
+      onSubmit={(e) => {
+        void onSave(e);
+      }}
+      className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+      aria-label={`Edit user ${user.name}`}
+    >
+      <div className="grid gap-2 sm:grid-cols-2">
+        <div>
+          <label
+            htmlFor={`edit-name-${user.id}`}
+            className="mb-0.5 block text-xs text-gray-600 dark:text-gray-400"
+          >
+            Name
+          </label>
+          <input
+            id={`edit-name-${user.id}`}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`edit-email-${user.id}`}
+            className="mb-0.5 block text-xs text-gray-600 dark:text-gray-400"
+          >
+            Email
+          </label>
+          <input
+            id={`edit-email-${user.id}`}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`edit-role-${user.id}`}
+            className="mb-0.5 block text-xs text-gray-600 dark:text-gray-400"
+          >
+            Role
+          </label>
+          <select
+            id={`edit-role-${user.id}`}
+            value={role}
+            onChange={(e) => setRole(e.target.value as "admin" | "member")}
+            className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+          >
+            <option value="member">member</option>
+            <option value="admin">admin</option>
+          </select>
+        </div>
+      </div>
+      {updateUser.error ? (
+        <p role="alert" className="mt-2 text-sm text-red-600 dark:text-red-400">
+          {updateUser.error instanceof Error ? updateUser.error.message : "Update failed."}
+        </p>
+      ) : null}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="submit"
+          disabled={updateUser.isPending}
+          className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+        >
+          {updateUser.isPending ? "Saving…" : "Save"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export function UserCard({ user }: UserCardProps) {
+  const [editing, setEditing] = useState(false);
+  const deleteUser = useDeleteUser();
 
   function onDelete() {
     if (!globalThis.confirm(`Delete ${user.name}? This cannot be undone.`)) return;
@@ -43,93 +133,7 @@ export function UserCard({ user }: UserCardProps) {
   }
 
   if (editing) {
-    return (
-      <form
-        onSubmit={(e) => {
-          void onSave(e);
-        }}
-        className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
-        aria-label={`Edit user ${user.name}`}
-      >
-        <div className="grid gap-2 sm:grid-cols-2">
-          <div>
-            <label
-              htmlFor={`edit-name-${user.id}`}
-              className="mb-0.5 block text-xs text-gray-600 dark:text-gray-400"
-            >
-              Name
-            </label>
-            <input
-              id={`edit-name-${user.id}`}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor={`edit-email-${user.id}`}
-              className="mb-0.5 block text-xs text-gray-600 dark:text-gray-400"
-            >
-              Email
-            </label>
-            <input
-              id={`edit-email-${user.id}`}
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor={`edit-role-${user.id}`}
-              className="mb-0.5 block text-xs text-gray-600 dark:text-gray-400"
-            >
-              Role
-            </label>
-            <select
-              id={`edit-role-${user.id}`}
-              value={role}
-              onChange={(e) => setRole(e.target.value as "admin" | "member")}
-              className="w-full rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white"
-            >
-              <option value="member">member</option>
-              <option value="admin">admin</option>
-            </select>
-          </div>
-        </div>
-        {updateUser.error ? (
-          <p role="alert" className="mt-2 text-sm text-red-600 dark:text-red-400">
-            {updateUser.error instanceof Error ? updateUser.error.message : "Update failed."}
-          </p>
-        ) : null}
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            type="submit"
-            disabled={updateUser.isPending}
-            className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
-          >
-            {updateUser.isPending ? "Saving…" : "Save"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              updateUser.reset();
-              setEditing(false);
-              setName(user.name);
-              setEmail(user.email);
-              setRole(user.role);
-            }}
-            className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
-    );
+    return <UserCardEditForm user={user} onClose={() => setEditing(false)} />;
   }
 
   return (
@@ -150,6 +154,12 @@ export function UserCard({ user }: UserCardProps) {
           >
             {user.role}
           </span>
+          <a
+            href={`/users/${encodeURIComponent(user.id)}/payment-methods`}
+            className="rounded border border-gray-300 px-2 py-1 text-sm hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+          >
+            OTU cards
+          </a>
           <button
             type="button"
             onClick={() => setEditing(true)}

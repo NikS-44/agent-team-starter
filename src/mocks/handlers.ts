@@ -1,14 +1,17 @@
 import { http, HttpResponse } from "msw";
-import { seedUsers } from "../../db/seed-data";
+import { seedPaymentMethods, seedUsers } from "../../db/seed-data";
+import type { PaymentMethod } from "../api/paymentMethods.schemas";
 import type { ShipVerifyResponse } from "../api/shipVerify.schemas";
 import type { User } from "../api/users.schemas";
 
 let userList: User[] = seedUsers.map((u) => ({ ...u }));
+let paymentMethodList: PaymentMethod[] = seedPaymentMethods.map((p) => ({ ...p }));
 
 export const userFixtures = seedUsers;
 
 function resetList() {
   userList = seedUsers.map((u) => ({ ...u }));
+  paymentMethodList = seedPaymentMethods.map((p) => ({ ...p }));
 }
 
 export { resetList as resetUserHandlersState };
@@ -39,13 +42,25 @@ export const handlers = [
         dialect: "sqlite",
         usersTableReadable: true,
         usersRowCount: userList.length,
-        drizzleMigrationsCount: 1,
+        drizzleMigrationsCount: 4,
       },
     };
     return HttpResponse.json(body);
   }),
 
   http.get("/api/users", () => HttpResponse.json(userList)),
+
+  http.get("/api/users/:userId/payment-methods", ({ params }) => {
+    const userId = Array.isArray(params.userId) ? params.userId[0] : params.userId;
+    if (!userId) {
+      return HttpResponse.json({ error: "Missing user id" }, { status: 400 });
+    }
+    if (!userList.some((u) => u.id === userId)) {
+      return HttpResponse.json({ error: "User not found." }, { status: 404 });
+    }
+    const rows = paymentMethodList.filter((p) => p.userId === userId);
+    return HttpResponse.json(rows);
+  }),
 
   http.post("/api/users", async ({ request }) => {
     const body = (await request.json()) as { name?: string; email?: string; role?: string };
@@ -109,6 +124,7 @@ export const handlers = [
       return HttpResponse.json({ error: "User not found." }, { status: 404 });
     }
     userList = userList.filter((u) => u.id !== id);
+    paymentMethodList = paymentMethodList.filter((p) => p.userId !== id);
     return new HttpResponse(null, { status: 204 });
   }),
 ];

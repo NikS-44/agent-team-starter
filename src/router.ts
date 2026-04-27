@@ -11,6 +11,7 @@ import { ComponentsDemoPage } from "./pages/ComponentsDemoPage";
 import { DashboardDemoPage } from "./pages/DashboardDemoPage";
 import { PlaygroundPage } from "./pages/PlaygroundPage";
 import { ShipReportPage } from "./pages/ShipReportPage";
+import { UserPaymentMethodsPage } from "./pages/UserPaymentMethodsPage";
 import { UsersPage } from "./pages/UsersPage";
 
 const rootRoute = createRootRoute({ component: App });
@@ -29,6 +30,12 @@ const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users",
   component: UsersPage,
+});
+
+const userPaymentMethodsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/users/$userId/payment-methods",
+  component: UserPaymentMethodsPage,
 });
 
 const playgroundRoute = createRoute({
@@ -64,6 +71,7 @@ const shipReportRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   usersRoute,
+  userPaymentMethodsRoute,
   playgroundRoute,
   componentsDemoRoute,
   dashboardDemoRoute,
