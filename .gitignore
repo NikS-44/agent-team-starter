@@ -28,3 +28,4 @@ verification/*
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+.worktrees/
