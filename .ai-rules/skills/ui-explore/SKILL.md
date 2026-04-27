@@ -2,7 +2,8 @@
 name: ui-explore
 description: >-
   Generate 4–5 distinct UI layouts for the same feature and data model, implement
-  each as a demo component, screenshot with Chrome DevTools MCP, and present a
+  each as a demo component, screenshot with Chrome DevTools MCP, run one UX
+  critique round on those images, apply one iteration of fixes, then present a
   side-by-side comparison so the team can choose a direction.
 ---
 
@@ -109,7 +110,28 @@ Start the dev server, navigate to the exploration route, and capture each varian
 
 ---
 
-## Step 5 — Present comparison
+## Step 5 — UX critique (one round)
+
+After screenshots exist under `verification/<branch-or-slug>/…`, run **exactly one** structured critique pass **before** writing the comparison article.
+
+1. Read the **`ux-critique`** skill. Default to **Mode 1: Heuristic sweep** on the exploration route (`/ui-explore/<feature-name>`). Use **Full audit** only if the exploration includes multi-step flows worth walking as a persona.
+2. Use the PNGs from Step 4 as primary evidence (re-open in the browser with `navigate_page` when live state helps).
+3. Produce a **findings table** with: **severity** (low / medium / high), **heuristic** (H1–H10), **finding**, **affected variant(s)**, and **evidence** (screenshot path or snapshot note).
+4. Save the write-up to `verification/<branch-or-slug>/ui-explore-<feature>-ux-findings.md` (flatten `/` in branch names for the folder, e.g. `nik/feature` → `verification/nik-feature/`).
+5. **Stop after this round** — do not loop critique passes unless the user explicitly asks for another.
+
+---
+
+## Step 6 — One iteration on variants
+
+Address **every medium and high** finding with **one** batch of UI changes in the exploration components (copy, contrast, focus, hierarchy, removing misleading chrome). **Low** findings are optional but should be fixed when the change is trivial.
+
+- Re-screenshot variants **only** where the visual delta matters for the team decision; otherwise note “verified in browser” in the comparison.
+- **Out of scope:** new layout variants, new dependencies, or shipping exploration code to production.
+
+---
+
+## Step 7 — Present comparison
 
 Produce a structured comparison the team can react to.
 
@@ -162,7 +184,7 @@ Produce a structured comparison the team can react to.
 - [ ] Team picks a variant (or hybrid).
 - [ ] Remove `// UI EXPLORE` components and route.
 - [ ] Implement chosen variant with real data hook and tests (see `strict-tdd`).
-- [ ] Run `ux-critique` on the final implementation before ship.
+- [ ] Run `ux-critique` again on the **shipped** implementation before merge if UX quality needs a final pass (exploration critique in Step 5 is not a substitute for production QA).
 ```
 
 ---
@@ -186,6 +208,8 @@ After the team picks a direction:
 - [ ] Same typed mock data used across all variants
 - [ ] Route added; dev server confirms it renders
 - [ ] Screenshot for each variant saved to `verification/<branch>/ui-explore-<feature>-<variant>.png`
+- [ ] One `ux-critique` round completed; findings saved to `verification/<branch-slug>/ui-explore-<feature>-ux-findings.md`
+- [ ] One iteration applied; medium+ findings addressed (or documented as wont-fix)
 - [ ] Comparison table with strengths/weaknesses for each variant
 - [ ] Recommendation or explicit "team decides" call made
 - [ ] Cleanup plan noted (exploration components are not shipped)
