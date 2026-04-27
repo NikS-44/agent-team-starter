@@ -4,7 +4,7 @@
 |------|-----|
 | `rules/defaults.mdc` | Always-on rule: points to `CLAUDE.md` and this tree. |
 | `rules/babysit.mdc` | When relevant: PR merge-ready loop (CI, conflicts, comment triage). Not always-on. |
-| `skills/**/SKILL.md` | e.g. **project-api**, **tech-debt**, **babysit**, **fix-comments**, **architecture-adr**, **design-doc**, **strict-tdd**, **systematic-debugging**, **improve-codebase**, **grill-me**, **branch-finishing**, **chrome-devtools-verify**, **drizzle-db-verify**, **commit** |
+| `skills/**/SKILL.md` | e.g. **project-api**, **tech-debt**, **babysit**, **fix-comments**, **architecture-adr**, **design-doc**, **strict-tdd**, **systematic-debugging**, **improve-codebase**, **grill-me**, **branch-finishing**, **chrome-devtools-verify**, **drizzle-db-verify**, **commit**, **ux-critique**, **ui-explore** |
 | `commands/*.md` | Slash commands: `/ship`, `/ship-light`, `/verify` |
 | `agents/*.md` | **lead** (branch / PR scope), **architect**, **critic**, **builder**, **reviewer** |
 | `mcp.json` | MCP config (symlinked as `.cursor/mcp.json` after install) |
