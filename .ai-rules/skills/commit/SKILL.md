@@ -1,6 +1,9 @@
 ---
 name: commit
-description: Create commits, push, open PR. Git-only.
+description: >-
+  Create commits from uncommitted work, push, and open a PR. Use when the user
+  asks to commit, push, land changes, save work to git, stage and ship code, or
+  open a pull request. Enforces conventional commits and branch safety.
 ---
 
 **GitHub:** Prefer **`gh`** for PRs and GitHub API calls. Do not reach for GitHub MCP when `gh pr` / `gh api` suffices.
