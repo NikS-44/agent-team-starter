@@ -27,8 +27,8 @@ Pick a mode from the user's request, or default to **full audit** on the primary
 
 ## Setup
 
-1. `pnpm dev:ready` (or `pnpm dev`) — note Vite URL (usually `:5173`).
-2. `list_pages` — confirm MCP is connected and note the page ID.
+1. `pnpm dev:ready` — note Vite URL (usually `:5173`).
+2. `list_pages` — confirm MCP is connected.
 3. Define **scope**: which route(s) or flow(s) to evaluate.
 4. Define **persona** if running a flow (template below).
 
@@ -36,16 +36,10 @@ Pick a mode from the user's request, or default to **full audit** on the primary
 
 ## Mode 1: Heuristic Sweep
 
-**Goal:** Rate a page against Nielsen's 10 Usability Heuristics.
-
-### Steps
-
-1. `navigate_page` to the target URL.
-2. `take_snapshot` — record element UIDs.
-3. `take_screenshot` → `verification/<branch>/ux-<route>-01-load.png` (`fullPage: true`).
-4. Screenshot each distinct state (empty, loaded, error) separately.
-5. For interactive elements (dropdowns, modals, accordions): `take_screenshot` **before** the interaction → interact → `take_snapshot` → `take_screenshot` **after**. Use paired names: `ux-<route>-02-before-<action>.png` / `ux-<route>-03-after-<action>.png`.
-6. Evaluate each heuristic (table below), note evidence and severity.
+1. `navigate_page` → `take_snapshot` → `take_screenshot` to `verification/<branch>/ux-<route>-01-load.png` (`fullPage: true`).
+2. Screenshot each distinct state (empty, loaded, error) separately.
+3. For interactive elements: **before** screenshot → interact → `take_snapshot` → **after** screenshot. Use paired names: `ux-<route>-02-before-<action>.png` / `ux-<route>-03-after-<action>.png`.
+4. Evaluate each heuristic below, note evidence and severity.
 
 ### Nielsen's 10 Heuristics
 
@@ -66,11 +60,7 @@ Pick a mode from the user's request, or default to **full audit** on the primary
 
 ## Mode 2: Persona Flow
 
-**Goal:** Simulate a real user completing a task; measure friction and completion.
-
-### Persona Template
-
-Ask the user if unclear; otherwise infer from context:
+Define the persona (ask the user if unclear; otherwise infer from context):
 
 ```
 Persona: <role + technical level, e.g. "first-time user, non-technical, on a laptop">
@@ -82,32 +72,13 @@ Task sequence:
 Success criteria: <what "done" looks like>
 ```
 
-### Steps
+For **each task step**: `take_snapshot` → **before** screenshot → `click` / `fill` / `type_text` → **after** screenshot. Log friction (confusing labels, missing affordances, unexpected state) and tag the relevant heuristic.
 
-1. `navigate_page` to starting URL.
-2. For **each task step**:
-   - `take_snapshot` to get fresh UIDs.
-   - `take_screenshot` before interaction → `ux-flow-<N>-before-<step>.png`.
-   - `click` / `fill` / `type_text` to perform the step.
-   - `take_screenshot` after → `ux-flow-<N>-after-<step>.png`.
-   - Log friction: confusing labels, missing affordances, unexpected state.
-3. `list_console_messages` — note errors/warnings that appeared during the flow.
-4. `list_network_requests` — flag failed requests or unexpected latency (>2 s).
-5. Score: did the persona complete the goal? How many steps? Any dead ends?
-
-### Friction Log (fill per step)
-
-| Step | Before screenshot | After screenshot | Friction observed | Heuristic | Severity |
-|------|-------------------|-----------------|-------------------|-----------|----------|
-| 1 — … | `ux-flow-01-before-…` | `ux-flow-01-after-…` | — | — | — |
+After the flow: `list_console_messages` (errors/warnings) and `list_network_requests` (failed or slow >2 s). Score: did the persona complete the goal? How many steps? Any dead ends?
 
 ---
 
 ## Mode 3: Error Injection
-
-**Goal:** Verify error states are clear, recoverable, and non-alarming.
-
-### Scenarios to test
 
 | Scenario | How to trigger |
 |----------|---------------|
@@ -116,14 +87,7 @@ Success criteria: <what "done" looks like>
 | Unauthorized | Access a protected resource without credentials |
 | Not found | Navigate to a non-existent route (e.g. `/does-not-exist`) |
 
-For each:
-1. `take_screenshot` before trigger → `ux-error-<type>-01-before.png`.
-2. Trigger the error.
-3. `take_snapshot` then `take_screenshot` → `ux-error-<type>-02-after.png`.
-4. Evaluate against **H9** (recovery) and **H5** (prevention):
-   - Is the message in plain language?
-   - Does it say what went wrong and what to do next?
-   - Can the user recover without losing their work?
+For each: **before** screenshot → trigger → `take_snapshot` → **after** screenshot. Evaluate against **H9** (recovery) and **H5** (prevention): plain-language message, clear next step, no lost work.
 
 ---
 
@@ -135,14 +99,10 @@ Run automatically as part of any audit:
 lighthouse_audit(url: <current page URL>, categories: ["accessibility"])
 ```
 
-Key thresholds:
 - Lighthouse a11y score ≥ 90 → pass; < 90 → flag findings.
-- Color contrast ≥ 4.5:1 (normal text), ≥ 3:1 (large text, UI components).
-- All interactive elements have visible focus rings.
-- Form inputs have visible labels (not just placeholder).
-- Images have `alt` text.
-- ARIA roles used correctly (no `role="button"` on non-interactive elements).
-- Tab order is logical; no focus traps.
+- Color contrast ≥ 4.5:1 (normal text), ≥ 3:1 (large text/UI components).
+- Interactive elements have visible focus rings; form inputs have visible labels.
+- Images have `alt` text; ARIA roles used correctly; tab order is logical.
 
 ---
 
@@ -178,15 +138,11 @@ Key thresholds:
 - **Goal:** <goal>
 - **Completed:** Yes / No / Partial
 - **Steps taken:** N (expected: M)
-- **Dead ends encountered:** none / <describe>
+- **Dead ends:** none / <describe>
 
 ### Accessibility
 - Lighthouse a11y score: XX/100
 - Blockers: <list or "none">
-
-### Screenshots
-- `verification/<branch>/ux-01-load.png`
-- ...
 
 ### Follow-ups
 - [ ] Critical: <fix description> — **blocks ship**

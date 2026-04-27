@@ -1,6 +1,9 @@
 ---
 name: route
-description: /route — Add/change TanStack Router routes; keep `AppShell` nav in sync.
+description: >-
+  Add or change TanStack Router routes and keep AppShell navigation in sync. Use
+  when adding, removing, or modifying routes, pages, nav links, or redirects in
+  this repo.
 ---
 
 # /route

@@ -59,54 +59,27 @@ Select 4–5 that are genuinely distinct for the feature. Name each variant clea
 
 Create lightweight prototype components. Use real or realistic mock data — not "Lorem ipsum."
 
-### File locations
-
 ```
 src/pages/ui-explore/<feature-name>/
   index.tsx          ← wrapper page; renders all variants with a tab or toggle switcher
   TableVariant.tsx
   CardGridVariant.tsx
-  TimelineVariant.tsx
-  KanbanVariant.tsx
-  DashboardVariant.tsx
+  ...
 ```
 
-Or, if a single file is cleaner (few variants, simple layouts):
-
-```
-src/pages/ui-explore/<feature-name>.tsx
-```
-
-### Implementation rules
-
-- Use the same mock data object / array for every variant — define it once at the top of `index.tsx` and pass as a prop.
-- Use only existing shared components (`src/components/ui/`) — **do not install new UI libraries** for exploration.
-- Keep each variant self-contained and independently renderable.
-- Add a route for the exploration page (e.g. `/ui-explore/<feature-name>`) using the `route` skill so it's accessible in the browser.
-- No tests needed for exploration components — they are throwaway scaffolding.
-- Mark the route and components with a `// UI EXPLORE: remove before ship` comment.
-
-### Mock data conventions
-
-- Use a typed constant: `const MOCK_<FEATURE>: <Type>[] = [...]`
-- Include at least 6–8 records covering edge cases: long text, missing optional fields, extreme values, different statuses.
-- Mirror the shape of the real Zod schema so swapping in a TanStack Query hook later is trivial.
+- Define mock data once at the top of `index.tsx` and pass as a prop to every variant. Use a typed constant (`const MOCK_<FEATURE>: <Type>[] = [...]`) with 6–8 records covering edge cases (long text, missing optional fields, extreme values, different statuses). Mirror the real Zod schema shape so swapping in a TanStack Query hook later is trivial.
+- Use only existing shared components (`src/components/ui/`) — **do not install new UI libraries**.
+- Add a route (e.g. `/ui-explore/<feature-name>`) via the `route` skill and mark it `// UI EXPLORE: remove before ship`.
+- No tests needed — these are throwaway scaffolding.
 
 ---
 
 ## Step 4 — Screenshot each variant
 
-Start the dev server, navigate to the exploration route, and capture each variant.
-
 1. `pnpm dev:ready` — note Vite URL.
 2. `navigate_page` to `/ui-explore/<feature-name>`.
-3. For **each variant**:
-   - Switch to the variant (click the tab/toggle in the wrapper page).
-   - `take_snapshot`.
-   - `take_screenshot` → `verification/<branch>/ui-explore-<feature>-<variant>.png` (`fullPage: true`).
-   - Note 2–3 observations per variant (what this layout emphasises, what it hides).
-4. Optionally, for variants with interactions (e.g. Kanban drag, Table sort):
-   - `take_screenshot` before → interact → `take_screenshot` after. Use `before`/`after` naming.
+3. For **each variant**: switch to it, `take_snapshot`, `take_screenshot` → `verification/<branch>/ui-explore-<feature>-<variant>.png` (`fullPage: true`). Note 2–3 observations (what this layout emphasises, what it hides).
+4. For variants with interactions (Kanban drag, Table sort): **before** screenshot → interact → **after** screenshot with `before`/`after` naming.
 
 ---
 
@@ -133,49 +106,22 @@ Address **every medium and high** finding with **one** batch of UI changes in th
 
 ## Step 7 — Present comparison
 
-Produce a structured comparison the team can react to.
-
 ```markdown
 ## UI Exploration — <feature name>
 
 **Data shape:** <summary of fields used>
 **Primary action:** <the task each variant must support>
-**Branch:** <branch name>
 
 ### Variants
 
-#### 1. Table View
-![table](verification/<branch>/ui-explore-<feature>-table.png)
+#### 1. <Variant name>
+![variant](verification/<branch>/ui-explore-<feature>-<variant>.png)
 
-**Strengths:** Dense, sortable, familiar for data-heavy workflows.  
-**Weaknesses:** No visual scanning; status is easy to miss.  
-**Best for:** Power users who know what they're looking for.
+**Strengths:** ...
+**Weaknesses:** ...
+**Best for:** ...
 
-#### 2. Card Grid
-![cards](verification/<branch>/ui-explore-<feature>-cards.png)
-
-**Strengths:** Status and key metadata visible at a glance.  
-**Weaknesses:** Lower information density; pagination required sooner.  
-**Best for:** Moderate record counts; scanning by visual cue.
-
-#### 3. Timeline / Feed
-...
-
-#### 4. Kanban Board
-...
-
-#### 5. Stat Dashboard
-...
-
-### Comparison Table
-
-| Criterion | Table | Card Grid | Timeline | Kanban | Dashboard |
-|-----------|-------|-----------|----------|--------|-----------|
-| Information density | ★★★★★ | ★★★☆☆ | ★★☆☆☆ | ★★★☆☆ | ★★★★☆ |
-| Scannability | ★★☆☆☆ | ★★★★☆ | ★★★☆☆ | ★★★★☆ | ★★★☆☆ |
-| Primary action support | ★★★★☆ | ★★★☆☆ | ★★☆☆☆ | ★★★★★ | ★★☆☆☆ |
-| Mobile-friendliness | ★★☆☆☆ | ★★★★☆ | ★★★★★ | ★★☆☆☆ | ★★★☆☆ |
-| Implementation complexity | Low | Low | Medium | High | High |
+#### 2. ...
 
 ### Recommendation
 <Suggested variant and rationale, or "ask the team to pick" if genuinely even>
@@ -191,25 +137,10 @@ Produce a structured comparison the team can react to.
 
 ## Cleanup
 
-After the team picks a direction:
-
-1. Delete `src/pages/ui-explore/<feature-name>/` (or the exploration file).
-2. Remove the exploration route from the router.
-3. Implement the chosen variant in its proper location with a real TanStack Query hook.
-4. Run `/ship` to implement, test, and verify.
-5. Run `ux-critique` on the final result if UX quality needs a second pass before merge.
-
----
+Delete `src/pages/ui-explore/<feature-name>/`, remove the route, implement the chosen variant in its proper location with a real TanStack Query hook, then run `/ship`.
 
 ## Checklist
 
-- [ ] Feature, data shape, primary action, and user defined
-- [ ] 4–5 genuinely distinct archetypes chosen (not near-duplicates)
-- [ ] Same typed mock data used across all variants
-- [ ] Route added; dev server confirms it renders
-- [ ] Screenshot for each variant saved to `verification/<branch>/ui-explore-<feature>-<variant>.png`
 - [ ] One `ux-critique` round completed; findings saved to `verification/<branch-slug>/ui-explore-<feature>-ux-findings.md`
 - [ ] One iteration applied; medium+ findings addressed (or documented as wont-fix)
-- [ ] Comparison table with strengths/weaknesses for each variant
-- [ ] Recommendation or explicit "team decides" call made
-- [ ] Cleanup plan noted (exploration components are not shipped)
+- [ ] Recommendation made (or explicit "team decides")
