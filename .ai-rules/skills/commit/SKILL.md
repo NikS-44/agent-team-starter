@@ -15,6 +15,27 @@ description: Create commits, push, open PR. Git-only.
 - First push: `git push -u origin <branch>`. **Remote exists?** `git ls-remote --heads origin <branch>`, not only `git branch -vv` (tracking can be wrong). After rebase: `git fetch` then `git push --force-with-lease=…` per team policy; **fetch** before force-with-lease to avoid stale rejection.
 - Hooks lint **staged file whole file** — if the error is in untouched lines, fix minimally or one scoped disable with “pre-existing” note, one retry. **Fallow:** do not nuke `.fallowrc.json` — use [official suppressions](https://docs.fallow.tools/configuration/suppression) or `// fallow-ignore-*` / `@public` as appropriate.
 
+## Commit message format (conventional commits)
+
+All commit messages **must** follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <short description>
+
+[optional body — why, not what]
+```
+
+**Allowed types:** `feat` · `fix` · `docs` · `style` · `refactor` · `perf` · `test` · `chore` · `ci` · `build` · `revert`
+
+- `feat`: new capability visible to a user or caller
+- `fix`: corrects broken behavior
+- `chore`: tooling, deps, config — no production behavior change
+- `refactor`: restructuring with no behavior change
+- `docs`: documentation only
+- Scope is optional but preferred when it narrows the area (e.g. `feat(auth):`, `fix(api):`).
+- Subject line: imperative mood, lowercase after the colon, no trailing period, ≤72 chars.
+- No vague subjects like `fix stuff`, `update`, `changes`. If you can't name what changed, split the commit.
+
 ## Principles (short)
 
 - One commit = one buildable story. Coupled edits together (export + all imports, signature + all callers, component + styles + tests). Mechanical/format-only in its own commit. Message body: **why**, not only what.
@@ -37,4 +58,4 @@ description: Create commits, push, open PR. Git-only.
 
 ## Avoid
 
-Broken intermediate commits, unrelated mixes, vague “fix/update” messages, schema changes without generated artifacts, code without its tests in the same logical commit when they belong together.
+Broken intermediate commits, unrelated mixes, non-conventional or vague subjects (`fix stuff`, `update`, `changes`), schema changes without generated artifacts, code without its tests in the same logical commit when they belong together.
