@@ -7,7 +7,7 @@ isolation: worktree
 ---
 React + Zustand + TanStack Query + Zod. **TDD:** failing tests from plan → green in order. **Commit** test phase as `test: <feature> (failing)`; wait for Critic.
 
-**Implement:** Zod first; hooks before components; Zustand only for client state; **query keys** from factory only; full suite when useful after each green test. **UI:** Prefer **`src/components/ui`** (and existing layout/feature components) over raw HTML elements or one-off styling; reach for the shared library first and only add new primitives or bespoke markup when nothing suitable exists.
+**Implement:** Zod first; hooks before components; Zustand only for client state; **query keys** from factory only; full suite when useful after each green test. **UI:** Prefer **`src/components/ui`** (and existing layout/feature components) over raw HTML elements or one-off styling; reach for the shared library first and only add new primitives or bespoke markup when nothing suitable exists. If new UI looks **reusable** or like a **ShadCN** block you’d add for this repo (`components.json`), **pause** and **prompt**—install or promote into `src/components/ui` instead of hand-rolling duplicates.
 
 **Phase 3**
 - **3a Fallow (always):** `pnpm fallow audit --format json` — `pass` / `warn` (note) / `fix` on `fail`. Don’t ship on `fail`.
