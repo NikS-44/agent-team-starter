@@ -9,14 +9,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
@@ -32,6 +24,11 @@ import { DEFAULT_SHIP_REPORT_ID, SHIP_REPORTS } from "@/data/shipReports";
 import type { ShipReportBranchEvidence } from "@/data/shipReportsTypes";
 import { buildClaudeNewChatLink, buildCursorDeeplinks } from "@/lib/shipDeeplinks";
 import { cn } from "@/lib/utils";
+import {
+  type LightboxSlide,
+  ShipReportImageLightbox,
+  useShipReportLightbox,
+} from "@/pages/shipReportLightbox";
 import { Link } from "@tanstack/react-router";
 import {
   CheckCircle2,
@@ -46,7 +43,6 @@ import {
   Network,
   Sparkles,
   Terminal,
-  X,
 } from "lucide-react";
 import * as React from "react";
 
@@ -70,18 +66,29 @@ function reportById(id: string) {
   return SHIP_REPORTS.find((r) => r.id === id) ?? SHIP_REPORTS[0];
 }
 
-type LightboxState =
-  | { kind: "gallery"; index: number }
-  | { kind: "branch"; src: string; caption: string }
-  | null;
-
 function ShipBranchEvidenceSection({
   evidence,
-  onOpenBranchImage,
+  onOpenBranchLightbox,
 }: {
   evidence: ShipReportBranchEvidence;
-  onOpenBranchImage: (src: string, caption: string) => void;
+  onOpenBranchLightbox: (slides: LightboxSlide[], index: number) => void;
 }) {
+  const branchSlides = React.useMemo<LightboxSlide[]>(
+    () => [
+      {
+        src: evidence.beforeSrc,
+        alt: `Full-page capture: ${evidence.baseLabel}`,
+        caption: evidence.baseLabel,
+      },
+      {
+        src: evidence.afterSrc,
+        alt: `Full-page capture: ${evidence.headLabel}`,
+        caption: evidence.headLabel,
+      },
+    ],
+    [evidence.afterSrc, evidence.beforeSrc, evidence.baseLabel, evidence.headLabel]
+  );
+
   return (
     <section
       className="space-y-4 rounded-2xl border border-border/80 bg-card/30 p-4 sm:p-6"
@@ -95,8 +102,9 @@ function ShipBranchEvidenceSection({
         Full-page captures from the same route: left is{" "}
         <span className="font-medium text-foreground">{evidence.baseLabel}</span>, right is{" "}
         <span className="font-medium text-foreground">{evidence.headLabel}</span>. Click an image to
-        zoom. Paths live under <code className="rounded bg-muted px-1 py-0.5 text-xs">public/</code>{" "}
-        so they ship in git and PR diffs.
+        open the lightbox; use arrows or ← → to switch baseline vs branch. Paths live under{" "}
+        <code className="rounded bg-muted px-1 py-0.5 text-xs">public/</code> so they ship in git
+        and PR diffs.
       </p>
       <div className="grid gap-4 lg:grid-cols-2">
         <figure className="space-y-2">
@@ -105,7 +113,7 @@ function ShipBranchEvidenceSection({
           </figcaption>
           <button
             type="button"
-            onClick={() => onOpenBranchImage(evidence.beforeSrc, evidence.baseLabel)}
+            onClick={() => onOpenBranchLightbox(branchSlides, 0)}
             aria-label={`Open full size: ${evidence.baseLabel}`}
             className={cn(
               "group w-full overflow-hidden rounded-xl border border-border/80 bg-muted/20 text-left shadow-sm",
@@ -134,7 +142,7 @@ function ShipBranchEvidenceSection({
           </figcaption>
           <button
             type="button"
-            onClick={() => onOpenBranchImage(evidence.afterSrc, evidence.headLabel)}
+            onClick={() => onOpenBranchLightbox(branchSlides, 1)}
             aria-label={`Open full size: ${evidence.headLabel}`}
             className={cn(
               "group w-full overflow-hidden rounded-xl border border-border/80 bg-muted/20 text-left shadow-sm",
@@ -236,7 +244,23 @@ function ShipBackendVerifyCard() {
   );
 }
 
-function LocalVerificationReportCard({ report }: { report: LocalVerificationReport }) {
+function LocalVerificationReportCard({
+  report,
+  onOpenImageLightbox,
+}: {
+  report: LocalVerificationReport;
+  onOpenImageLightbox: (slides: LightboxSlide[], index: number) => void;
+}) {
+  const slides = React.useMemo<LightboxSlide[]>(
+    () =>
+      report.images.map((image) => ({
+        src: image.src,
+        alt: image.caption,
+        caption: `${image.caption} — ${image.path}`,
+      })),
+    [report.images]
+  );
+
   const createdDate = report.createdAt ? new Date(report.createdAt) : null;
   const createdLabel =
     createdDate && !Number.isNaN(createdDate.getTime()) ? createdDate.toLocaleString() : undefined;
@@ -259,16 +283,31 @@ function LocalVerificationReportCard({ report }: { report: LocalVerificationRepo
       <CardContent className="space-y-4">
         {report.images.length > 0 ? (
           <ul className="grid list-none grid-cols-1 gap-3 sm:grid-cols-2">
-            {report.images.map((image) => (
+            {report.images.map((image, imageIndex) => (
               <li key={image.path}>
                 <figure className="overflow-hidden rounded-xl border border-border/80 bg-muted/20">
-                  <img
-                    src={image.src}
-                    alt={image.caption}
-                    className="aspect-[16/10] w-full object-cover object-top"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => onOpenImageLightbox(slides, imageIndex)}
+                    aria-label={`Open full size: ${image.caption}`}
+                    className={cn(
+                      "group relative block w-full overflow-hidden text-left",
+                      "transition hover:opacity-[0.98] focus-visible:ring-2 focus-visible:ring-ring"
+                    )}
+                  >
+                    <img
+                      src={image.src}
+                      alt={image.caption}
+                      className="aspect-[16/10] w-full object-cover object-top"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition group-hover:bg-black/20">
+                      <span className="flex size-10 items-center justify-center rounded-full bg-background/95 opacity-0 shadow ring-1 ring-border/80 transition group-hover:opacity-100">
+                        <Maximize2 className="size-5 text-foreground" aria-hidden />
+                      </span>
+                    </span>
+                  </button>
                   <figcaption className="space-y-1 p-2.5">
                     <span className="block text-xs font-medium text-foreground">
                       {image.caption}
@@ -305,7 +344,13 @@ function LocalVerificationReportCard({ report }: { report: LocalVerificationRepo
   );
 }
 
-function LocalVerificationSection() {
+function LocalVerificationSection({
+  onOpenImageLightbox,
+  onClearLightbox,
+}: {
+  onOpenImageLightbox: (slides: LightboxSlide[], index: number) => void;
+  onClearLightbox: () => void;
+}) {
   const [selectedReportId, setSelectedReportId] = React.useState(
     LOCAL_VERIFICATION_REPORTS[0]?.id ?? ""
   );
@@ -328,7 +373,8 @@ function LocalVerificationSection() {
           <code className="rounded bg-muted px-1 py-0.5 text-xs">title</code> and{" "}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">summary</code> and{" "}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">createdAt</code> to label and sort
-          a run. Timestamped reports load newest first.
+          a run. Timestamped reports load newest first. Click any screenshot to open a lightbox; use
+          the side arrows or keyboard ← → to step through images in that folder.
         </p>
       </div>
       {selectedReport ? (
@@ -355,9 +401,12 @@ function LocalVerificationSection() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup
-                  value={selectedReport.id}
+                  value={selectedReportId}
                   onValueChange={(value) => {
-                    if (value) setSelectedReportId(value);
+                    if (value) {
+                      setSelectedReportId(value);
+                      onClearLightbox();
+                    }
                   }}
                 >
                   {LOCAL_VERIFICATION_REPORTS.map((localReport) => (
@@ -373,7 +422,10 @@ function LocalVerificationSection() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <LocalVerificationReportCard report={selectedReport} />
+          <LocalVerificationReportCard
+            report={selectedReport}
+            onOpenImageLightbox={onOpenImageLightbox}
+          />
         </div>
       ) : (
         <Card className="border-dashed">
@@ -390,27 +442,10 @@ function LocalVerificationSection() {
 
 export function ShipReportPage() {
   const [reportId, setReportId] = React.useState<string>(DEFAULT_SHIP_REPORT_ID);
-  const [lightbox, setLightbox] = React.useState<LightboxState>(null);
+  const { lightbox, setLightbox, lightboxSlide, lightboxOpen, canPrev, canNext, goPrev, goNext } =
+    useShipReportLightbox();
 
   const report = reportById(reportId);
-  const openGalleryImage = lightbox?.kind === "gallery" ? report.images[lightbox.index] : undefined;
-  const openBranch =
-    lightbox?.kind === "branch" ? { src: lightbox.src, caption: lightbox.caption } : undefined;
-  const lightboxPayload =
-    openGalleryImage !== undefined
-      ? {
-          src: openGalleryImage.src,
-          alt: openGalleryImage.alt,
-          caption: openGalleryImage.caption,
-        }
-      : openBranch !== undefined
-        ? {
-            src: openBranch.src,
-            alt: openBranch.caption,
-            caption: openBranch.caption,
-          }
-        : null;
-  const lightboxOpen = lightboxPayload !== null;
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-8">
@@ -468,7 +503,10 @@ export function ShipReportPage() {
 
       <ShipBackendVerifyCard />
 
-      <LocalVerificationSection />
+      <LocalVerificationSection
+        onOpenImageLightbox={(slides, index) => setLightbox({ slides, index })}
+        onClearLightbox={() => setLightbox(null)}
+      />
 
       <section
         className="space-y-4 rounded-2xl border border-border/80 bg-card/30 p-4 sm:p-6"
@@ -511,7 +549,7 @@ export function ShipReportPage() {
       {report.branchEvidence ? (
         <ShipBranchEvidenceSection
           evidence={report.branchEvidence}
-          onOpenBranchImage={(src, caption) => setLightbox({ kind: "branch", src, caption })}
+          onOpenBranchLightbox={(slides, index) => setLightbox({ slides, index })}
         />
       ) : null}
 
@@ -521,14 +559,24 @@ export function ShipReportPage() {
             Screenshots
           </h3>
           <p className="text-sm text-muted-foreground">
-            Click a thumb to open the lightbox (Esc or ✕ to close).
+            Click a thumb to open the lightbox. Use arrow buttons or ← → keys to move between
+            images; Esc or ✕ closes.
           </p>
           <ul className="grid list-none grid-cols-1 gap-3 sm:grid-cols-2">
             {report.images.map((img, i) => (
               <li key={img.src}>
                 <button
                   type="button"
-                  onClick={() => setLightbox({ kind: "gallery", index: i })}
+                  onClick={() =>
+                    setLightbox({
+                      slides: report.images.map((image) => ({
+                        src: image.src,
+                        alt: image.alt,
+                        caption: image.caption,
+                      })),
+                      index: i,
+                    })
+                  }
                   aria-label={`Open full size: ${img.caption}`}
                   className={cn(
                     "group w-full overflow-hidden rounded-xl border border-border/80 bg-muted/20 text-left shadow-sm",
@@ -559,60 +607,16 @@ export function ShipReportPage() {
         </section>
       ) : null}
 
-      <Dialog
-        open={lightboxOpen}
-        onOpenChange={(o) => {
-          if (!o) setLightbox(null);
-        }}
-      >
-        <DialogContent
-          overlayClassName="cursor-pointer bg-black/75 supports-backdrop-filter:backdrop-blur-sm"
-          showCloseButton={false}
-          className={cn(
-            /* Keep default position: fixed (do not add "relative" — it overrides fixed and the panel scrolls in-document). */
-            /* Override: grid + sm:max-w-sm so the panel can be nearly full screen with padding. */
-            "!flex h-[min(100dvh-1.5rem,100vh-1.5rem)] w-[min(100vw-1.5rem,100%)] !max-w-[min(100vw-1.5rem,100%)]",
-            "min-h-0 flex-col gap-0 overflow-hidden border-0 bg-zinc-950/40 p-3 shadow-none ring-0 sm:p-4 md:p-5",
-            "cursor-pointer"
-          )}
-          onClick={(e) => {
-            if ((e.target as HTMLElement | null)?.tagName === "IMG") return;
-            setLightbox(null);
-          }}
-        >
-          {lightboxPayload ? (
-            <>
-              <DialogHeader className="sr-only">
-                <DialogTitle>{lightboxPayload.caption}</DialogTitle>
-                <DialogDescription>
-                  Full-size screenshot. Use close control or Esc to leave.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  size="icon-sm"
-                  variant="secondary"
-                  className="absolute top-2 right-2 z-20 size-9 cursor-pointer rounded-full border-0 bg-zinc-900/80 text-zinc-100 shadow-lg hover:bg-zinc-800 sm:top-3 sm:right-3"
-                  aria-label="Close lightbox"
-                >
-                  <X className="size-4" />
-                </Button>
-              </DialogClose>
-              <div className="flex min-h-0 w-full min-w-0 flex-1 items-center justify-center overflow-auto p-0.5">
-                <img
-                  src={lightboxPayload.src}
-                  alt={lightboxPayload.alt}
-                  className="h-auto max-h-full w-full max-w-full cursor-default object-contain object-center"
-                />
-              </div>
-              <p className="shrink-0 pt-2 text-center text-sm text-zinc-200 sm:pt-3">
-                {lightboxPayload.caption}
-              </p>
-            </>
-          ) : null}
-        </DialogContent>
-      </Dialog>
+      <ShipReportImageLightbox
+        lightbox={lightbox}
+        lightboxSlide={lightboxSlide}
+        lightboxOpen={lightboxOpen}
+        canPrev={canPrev}
+        canNext={canNext}
+        goPrev={goPrev}
+        goNext={goNext}
+        onDismiss={() => setLightbox(null)}
+      />
 
       {report.reprompts.length > 0 ? (
         <section className="space-y-3" aria-labelledby="reprompt-heading">
