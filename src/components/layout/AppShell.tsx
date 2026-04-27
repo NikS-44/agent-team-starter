@@ -79,7 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </Sidebar>
       <SidebarInset>
         <header
-          className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-2 backdrop-blur supports-backdrop-filter:bg-background/60 md:px-4"
+          className="flex h-[69px] shrink-0 items-center gap-2 border-b bg-background/95 px-2 backdrop-blur supports-backdrop-filter:bg-background/60 md:px-4"
           role="banner"
         >
           <SidebarTrigger className="md:-ml-1" />
