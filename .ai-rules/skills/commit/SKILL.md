@@ -47,8 +47,9 @@ All commit messages **must** follow [Conventional Commits](https://www.conventio
 3. **Group** into commits (list plan: title, why, files per commit; ask if unclear).
 4. `git add` / `git add -p` → `git commit` with heredoc message.
 5. After all commits: `git log --oneline`, spot-check `git show --name-only` per commit.
-6. **Push before calling the commit done:** `git ls-remote --heads origin <branch>` empty → `git push -u origin <branch>`. Else `git fetch origin <branch>` then push or force-with-lease as needed. `git status -s` after push.
-7. **PR before calling the commit done:** `gh pr view` if one exists; otherwise `gh pr create` with `## Summary` + `## Test plan` + `## Coverage` (paste Vitest % from `pnpm test:coverage` or point to the CI **Coverage** summary; note any waiver vs the gate in `vite.config.ts`). Return the PR URL.
+6. **Coverage check before push:** `pnpm test:coverage` — all thresholds in `vite.config.ts` must pass. If a threshold fails, fix the gap or obtain an explicit team waiver before continuing. Do not skip or suppress; catching this here avoids a CI failure that blocks the PR.
+7. **Push before calling the commit done:** `git ls-remote --heads origin <branch>` empty → `git push -u origin <branch>`. Else `git fetch origin <branch>` then push or force-with-lease as needed. `git status -s` after push.
+8. **PR before calling the commit done:** `gh pr view` if one exists; otherwise `gh pr create` with `## Summary` + `## Test plan` + `## Coverage` (paste Vitest % from step 6; note any waiver vs the gate in `vite.config.ts`). Return the PR URL.
 
 ## Common
 
