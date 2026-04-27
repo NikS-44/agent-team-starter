@@ -20,7 +20,7 @@ This skill is for branch-level readiness. For git safety, commit grouping, push,
 5. **Fallow** — run Fallow MCP audit or `pnpm fallow audit`; fix `fail`, report `warn`.
 6. **Evidence** — collect verification notes and screenshot paths for UI work. Do not commit verification PNGs unless asked.
 7. **Commit readiness** — use `commit` skill to group changes into buildable commits and avoid unrelated files.
-8. **PR readiness** — push/update the branch and create/update the PR with Summary and Verification sections.
+8. **PR readiness** — push/update the branch; create or update the PR with **`gh`** (`gh pr create`, `gh pr view`, `gh pr edit`) and Summary + Verification sections.
 9. **Clean exit** — end with clean `git status -s` or clearly report remaining intentional changes.
 
 ## PR Body Shape

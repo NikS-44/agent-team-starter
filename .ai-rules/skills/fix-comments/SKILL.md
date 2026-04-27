@@ -2,19 +2,19 @@
 name: fix-comments
 description: >-
   Address GitHub PR review: gather unresolved feedback, TODO list, implement selected
-  items, thread replies. Needs `gh` (and optionally GitHub MCP).
+  items, thread replies. Requires GitHub CLI (`gh`).
 ---
 
 # Fix PR comments
 
-**Need:** `gh` installed and `gh auth login`. Prefer GitHub MCP when present; else `gh api` / `gh pr`.
+**Need:** `gh` installed and `gh auth login`. **Prefer `gh`** for every GitHub operation (`gh pr`, `gh api`, GraphQL via `gh api graphql`). Use GitHub MCP only when `gh` cannot do the job.
 
 **Rules:** Threaded replies to the **original** thread. **Conventional Comments** + response labels (below). **Do not** post to GitHub until the user approves draft replies. Praise/LGTM/non-actionable → skip (no TODO, no reply).
 
 ## 1) Find PR and collect **unresolved** only
 
 - PR: `gh pr view --json number` or ask once for number. Owner/repo: `gh repo view --json nameWithOwner`. Base: `gh pr view <n> --json baseRefName`.
-- Sources: (a) issue comments on the PR, (b) review threads (`isResolved: false` only), (c) review bodies worth acting on. Use MCP `pull_request_read` or `gh api` / GraphQL — **exclude** `isResolved: true` and **praise / thanks / LGTM** with no request.
+- Sources: (a) issue comments on the PR, (b) review threads (`isResolved: false` only), (c) review bodies worth acting on. Collect via **`gh api`** / `gh api graphql` (see Reference) — **exclude** `isResolved: true` and **praise / thanks / LGTM** with no request.
 - De-dupe; flag `isOutdated` as low priority.
 
 **Per item store:** `source_type` (issue / inline / review), stable `id` (REST `databaseId` for inline), `body`, `path:line` if any, `author`, `url`, `isOutdated`.
@@ -55,9 +55,13 @@ Ask: **“Which ids should I implement?”** and wait. Then implement **only** s
 
 ## 7) Post (after user confirms)
 
-- **Inline:** MCP `add_reply_to_pull_request_comment` or  
-  `gh api -X POST repos/{o}/{r}/pulls/{pr}/comments/{databaseId}/replies -f body='...'`
-- **Issue comment:** `gh pr comment` / MCP equivalent for top-level.
+- **Inline (threaded reply to a review comment):** **`gh api`** using the REST path that includes the **PR number**:
+  ```bash
+  gh api -X POST repos/{owner}/{repo}/pulls/{pr_number}/comments/{comment_id}/replies -f body='...'
+  ```
+  Use the PR you are on (`gh pr view --json number`) for `{pr_number}`. For `{comment_id}`, use the thread’s REST id — same value as GraphQL `databaseId` (or `gh api repos/{owner}/{repo}/pulls/{pr_number}/comments --jq '.[].id'`).
+  **404 trap:** `repos/{owner}/{repo}/pulls/comments/{comment_id}/replies` **omits** `{pr_number}` and is **not** a valid endpoint; GitHub returns Not Found.
+- **Issue comment (PR conversation):** `gh pr comment` or `gh api -X POST repos/{owner}/{repo}/issues/{pr_number}/comments -f body='...'`.
 
 Reply text: one tight paragraph; link what changed. Don’t thread-reply to your own comments unless it helps reviewers.
 

@@ -22,4 +22,4 @@ Get the current PR to a **merge-ready** state: CI matches **`CLAUDE.md` / `pnpm 
 4. **CI** — Reproduce locally when possible (`pnpm verify` for this repo). Small, scoped commits; push and re-check CI until green.
 5. **Stop** — When checks pass, branch is up to date, and open feedback is addressed or explicitly deferred.
 
-**Need:** `gh auth login`; GitHub MCP optional. Follow **commit** skill for push / force-with-lease policy on shared branches.
+**Need:** `gh auth login`. **GitHub:** prefer **`gh`** for PR state, checks, and comments; GitHub MCP only if `gh` cannot do the task. Follow **commit** skill for push / force-with-lease policy on shared branches.
