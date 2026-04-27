@@ -3,6 +3,8 @@ name: commit
 description: Create commits, push, open PR. Git-only.
 ---
 
+**GitHub:** Prefer **`gh`** for PRs and GitHub API calls. Do not reach for GitHub MCP when `gh pr` / `gh api` suffices.
+
 ## Safety (read first)
 
 - **Merged PR / branch:** Do not add commits on a branch whose PR is already merged. The pre-commit hook (`scripts/precommit-merged-pr-guard.sh`) blocks that (via `gh` when available). Create a new branch from `main`: `git fetch origin && git switch -c <user>/<topic> origin/main`. One-off bypass: `SKIP_MERGED_BRANCH_GUARD=1 git commit` (avoid for normal work).

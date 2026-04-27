@@ -7,7 +7,7 @@ alwaysApply: false
 
 When the user wants to **babysit** a PR or keep a branch **merge-ready**:
 
-- Use **`gh`** (and GitHub MCP if available) for PR state and CI.
+- Use **`gh`** for PR state and CI; GitHub MCP only when **`gh`** cannot perform the operation.
 - **CI:** align fixes with root **`CLAUDE.md`**; run **`pnpm verify`** locally when debugging failures.
 - **Conflicts:** sync with base; resolve only when the right resolution is clear—otherwise ask.
 - **Comments:** address actionable feedback; skip or dispute low-value items with a short note. For GitHub **review threads**, structured replies, and “which comments to implement,” use **`.ai-rules/skills/fix-comments/SKILL.md`**.
